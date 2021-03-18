@@ -7,7 +7,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
@@ -33,7 +32,8 @@ public class User {
   @NotBlank(message = "Password is required")
   private String password;
 
-  private boolean enabled;
+  @NotBlank(message = "Name is required")
+  private String name;
 
   @OneToOne(cascade = CascadeType.MERGE)
   private Role role;
@@ -45,4 +45,6 @@ public class User {
   @OneToMany
   @JoinColumn(name = "user_id", referencedColumnName = "user_id")
   private List<History> histories;
+
+  private Boolean enabled;
 }
