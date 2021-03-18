@@ -1,5 +1,8 @@
 package com.tusur.cargo.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -35,16 +38,26 @@ public class User {
   @NotBlank(message = "Name is required")
   private String name;
 
+  @JsonFormat(shape = Shape.STRING)
   @OneToOne(cascade = CascadeType.MERGE)
   private Role role;
 
+  @JsonIgnore
   @OneToMany
-  @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+  @JoinColumn(name = "userId", referencedColumnName = "userId")
   private List<Order> orders;
 
+  @JsonIgnore
   @OneToMany
-  @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+  @JoinColumn(name = "userId", referencedColumnName = "userId")
   private List<History> histories;
 
   private Boolean enabled;
+
+  public User(String email, String password, String name, boolean enabled) {
+    this.email = email;
+    this.password = password;
+    this.name = name;
+    this.enabled = enabled;
+  }
 }

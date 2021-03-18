@@ -1,5 +1,6 @@
 package com.tusur.cargo.controller;
 
+import com.tusur.cargo.dto.AuthenticationResponse;
 import com.tusur.cargo.dto.LoginRequest;
 import com.tusur.cargo.dto.SignupRequest;
 import com.tusur.cargo.service.AuthService;
@@ -21,7 +22,7 @@ public class AuthController {
 
   private final AuthService authService;
 
-  @PostMapping("/sigup")
+  @PostMapping("/signup")
   public ResponseEntity<?> register(@RequestBody @Valid SignupRequest signupRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(signupRequest));
   }
@@ -33,6 +34,8 @@ public class AuthController {
 
   @PostMapping("/login")
   public ResponseEntity<?> loginUser(@RequestBody @Valid LoginRequest loginRequest) {
-    return ResponseEntity.status(HttpStatus.ACCEPTED).body(authService.login(loginRequest));
+    AuthenticationResponse response = authService.login(loginRequest);
+    if (response == null) return ResponseEntity.badRequest().body(null);
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
   }
 }

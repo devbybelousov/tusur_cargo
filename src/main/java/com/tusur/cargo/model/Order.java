@@ -40,7 +40,7 @@ public class Order {
   private Instant arrivalDate;
 
   @OneToMany
-  @JoinColumn(name = "order_id", referencedColumnName = "order_id")
+  @JoinColumn(name = "orderId", referencedColumnName = "orderId")
   private List<Photo> photos;
 
   @OneToOne

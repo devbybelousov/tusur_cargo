@@ -5,8 +5,10 @@ import com.tusur.cargo.dto.LoginRequest;
 import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.dto.SignupRequest;
 import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.model.VerificationToken;
+import com.tusur.cargo.repository.RoleRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.repository.VerificationTokenRepository;
 import com.tusur.cargo.security.JwtTokenProvider;
@@ -30,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
   private final MailService mailService;
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
+  private final RoleRepository roleRepository;
 
   @Transactional
   @Override
@@ -37,11 +40,22 @@ public class AuthServiceImpl implements AuthService {
     if (userRepository.existsByEmail(signupRequest.getEmail())) {
       return -1;
     }
+
+    if(!roleRepository.existsByTitle(signupRequest.getRole())){
+      Role newRole = new Role();
+      newRole.setTitle(signupRequest.getRole());
+      roleRepository.save(newRole);
+    }
+
     User user = new User();
+    Role role = roleRepository.findByTitle(signupRequest.getRole()).orElseThrow(
+        () -> new SpringCargoException("Role not found with title - " + signupRequest.getRole()));
+    user.setRole(role);
     user.setEmail(signupRequest.getEmail());
     user.setName(signupRequest.getName());
     user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
     user.setEnabled(false);
+
     String token = generateVerificationToken(userRepository.save(user));
     mailService
         .sendMail(new NotificationEmail("Please Activate Your Account",
@@ -78,6 +92,9 @@ public class AuthServiceImpl implements AuthService {
     SecurityContextHolder.getContext().setAuthentication(authenticate);
     User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(
         () -> new SpringCargoException("User not found with email - " + loginRequest.getEmail()));
+    if (!user.getEnabled()) {
+      return null;
+    }
     String token = jwtTokenProvider.generateToken(authenticate);
     return new AuthenticationResponse(user.getUserId(), token, user.getRole().getTitle());
   }

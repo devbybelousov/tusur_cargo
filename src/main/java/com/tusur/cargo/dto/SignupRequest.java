@@ -24,4 +24,8 @@ public class SignupRequest {
   @NotBlank(message = "Name is required")
   @Size(max = 30)
   private String name;
+
+  @NotBlank(message = "Role is required")
+  @Size(max = 20)
+  private String role;
 }
