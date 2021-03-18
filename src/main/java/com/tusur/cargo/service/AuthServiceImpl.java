@@ -76,8 +76,10 @@ public class AuthServiceImpl implements AuthService {
         new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
             loginRequest.getPassword()));
     SecurityContextHolder.getContext().setAuthentication(authenticate);
+    User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(
+        () -> new SpringCargoException("User not found with email - " + loginRequest.getEmail()));
     String token = jwtTokenProvider.generateToken(authenticate);
-    return new AuthenticationResponse(loginRequest.getEmail(), token);
+    return new AuthenticationResponse(user.getUserId(), token, user.getRole().getTitle());
   }
 
   @Transactional
