@@ -1,5 +1,6 @@
 package com.tusur.cargo.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.Instant;
 import java.util.List;
 import javax.persistence.Entity;
@@ -7,6 +8,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -45,5 +47,25 @@ public class Order {
 
   @OneToOne
   private Size size;
+
+  @JsonIgnore
+  @ManyToOne
+  @JoinColumn(name = "userId", referencedColumnName = "userId")
+  private User user;
+
+  public Order(String type, String title, String description, String addressSender,
+      String addressRecipient, int price, Instant departDate, Instant arrivalDate, Size size,
+      List<Photo> photos) {
+    this.type = type;
+    this.title = title;
+    this.description = description;
+    this.addressSender = addressSender;
+    this.addressRecipient = addressRecipient;
+    this.price = price;
+    this.departDate = departDate;
+    this.arrivalDate = arrivalDate;
+    this.size = size;
+    this.photos = photos;
+  }
 }
 

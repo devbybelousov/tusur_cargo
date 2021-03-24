@@ -1,4 +1,4 @@
-package com.tusur.cargo.service;
+package com.tusur.cargo.service.mail;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

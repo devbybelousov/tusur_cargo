@@ -32,6 +32,7 @@ public class User {
   @Email
   private String email;
 
+  @JsonIgnore
   @NotBlank(message = "Password is required")
   private String password;
 
@@ -52,6 +53,7 @@ public class User {
   @JoinColumn(name = "userId", referencedColumnName = "userId")
   private List<History> histories;
 
+  @JsonIgnore
   private Boolean enabled;
 
   public User(String email, String password, String name, boolean enabled) {
@@ -59,5 +61,10 @@ public class User {
     this.password = password;
     this.name = name;
     this.enabled = enabled;
+  }
+
+  @Override
+  public String toString(){
+    return "User(" + getUserId() + getEmail() + getName() + getEnabled() + getRole() + ")";
   }
 }

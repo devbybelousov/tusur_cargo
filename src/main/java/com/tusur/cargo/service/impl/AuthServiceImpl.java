@@ -1,4 +1,4 @@
-package com.tusur.cargo.service;
+package com.tusur.cargo.service.impl;
 
 import com.tusur.cargo.dto.AuthenticationResponse;
 import com.tusur.cargo.dto.LoginRequest;
@@ -12,8 +12,11 @@ import com.tusur.cargo.repository.RoleRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.repository.VerificationTokenRepository;
 import com.tusur.cargo.security.JwtTokenProvider;
+import com.tusur.cargo.service.AuthService;
+import com.tusur.cargo.service.mail.MailService;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
   private final UserRepository userRepository;
@@ -41,15 +45,9 @@ public class AuthServiceImpl implements AuthService {
       return -1;
     }
 
-    if(!roleRepository.existsByTitle(signupRequest.getRole())){
-      Role newRole = new Role();
-      newRole.setTitle(signupRequest.getRole());
-      roleRepository.save(newRole);
-    }
-
     User user = new User();
-    Role role = roleRepository.findByTitle(signupRequest.getRole()).orElseThrow(
-        () -> new SpringCargoException("Role not found with title - " + signupRequest.getRole()));
+    Role role = roleRepository.findByTitle("USER").orElseThrow(
+        () -> new SpringCargoException("Role not found with title - USER"));
     user.setRole(role);
     user.setEmail(signupRequest.getEmail());
     user.setName(signupRequest.getName());
@@ -58,17 +56,18 @@ public class AuthServiceImpl implements AuthService {
 
     String token = generateVerificationToken(userRepository.save(user));
     mailService
-        .sendMail(new NotificationEmail("Please Activate Your Account",
+        .sendMail(new NotificationEmail("Пожалуйста, подтвердите свой аккаунт",
             user.getEmail(),
-            "Thank you for signing up to Spring Reddit, " +
-                "please click on the below url to activate your account: " +
+            "Спасибо, что зарегистрировались на CarGoBob, " +
+                "пожалуйста, нажмите на ссылку чтобы подтвердить свой аккаунт: " +
                 "http://localhost:8080/api/auth/accountVerification/" + token));
     return 1;
   }
 
+  @Transactional
   @Override
   public String generateVerificationToken(User user) {
-    String token = UUID.randomUUID().toString().replace('-', ')');
+    String token = UUID.randomUUID().toString().replace("-", "");
     VerificationToken verificationToken = new VerificationToken();
     verificationToken.setToken(token);
     verificationToken.setUser(user);
@@ -92,9 +91,7 @@ public class AuthServiceImpl implements AuthService {
     SecurityContextHolder.getContext().setAuthentication(authenticate);
     User user = userRepository.findByEmail(loginRequest.getEmail()).orElseThrow(
         () -> new SpringCargoException("User not found with email - " + loginRequest.getEmail()));
-    if (!user.getEnabled()) {
-      return null;
-    }
+
     String token = jwtTokenProvider.generateToken(authenticate);
     return new AuthenticationResponse(user.getUserId(), token, user.getRole().getTitle());
   }

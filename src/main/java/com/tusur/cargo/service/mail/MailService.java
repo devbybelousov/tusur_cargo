@@ -1,4 +1,4 @@
-package com.tusur.cargo.service;
+package com.tusur.cargo.service.mail;
 
 import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.exception.SpringCargoException;

@@ -1,4 +1,4 @@
-package com.tusur.cargo.service;
+package com.tusur.cargo.service.impl;
 
 import com.tusur.cargo.dto.SignupRequest;
 import com.tusur.cargo.exception.SpringCargoException;
@@ -6,11 +6,13 @@ import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.repository.RoleRepository;
 import com.tusur.cargo.repository.UserRepository;
+import com.tusur.cargo.service.UserService;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -22,17 +24,20 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
 
   @Override
+  @Transactional
   public User getUserInfo(Long id) {
     return userRepository.findByUserId(id)
         .orElseThrow(() -> new SpringCargoException("User not found with id - " + id));
   }
 
   @Override
+  @Transactional
   public List<User> getAllUser() {
     return userRepository.findAll();
   }
 
   @Override
+  @Transactional
   public short editUser(SignupRequest signupRequest, Long id) {
     User user = userRepository.findByUserId(id)
         .orElseThrow(() -> new SpringCargoException("User not found with name - " + id));
@@ -47,6 +52,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public short createUser(SignupRequest signupRequest) {
     if (userRepository.existsByEmail(signupRequest.getEmail())) {
       return -1;
@@ -62,6 +68,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public short deleteUser(Long id) {
     User user = userRepository.findByUserId(id)
         .orElseThrow(() -> new SpringCargoException("User not found with id - " + id));
@@ -70,6 +77,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Override
+  @Transactional
   public short banUser(Long id) {
     User user = userRepository.findByUserId(id)
         .orElseThrow(() -> new SpringCargoException("User not found with id - " + id));

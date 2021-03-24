@@ -22,7 +22,7 @@ public class AuthController {
 
   private final AuthService authService;
 
-  @PostMapping("/signup")
+  @PostMapping("/sign-up")
   public ResponseEntity<?> register(@RequestBody @Valid SignupRequest signupRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(signupRequest));
   }
@@ -32,10 +32,8 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.OK).body(authService.verifyAccount(token));
   }
 
-  @PostMapping("/login")
+  @PostMapping("/sign-in")
   public ResponseEntity<?> loginUser(@RequestBody @Valid LoginRequest loginRequest) {
-    AuthenticationResponse response = authService.login(loginRequest);
-    if (response == null) return ResponseEntity.badRequest().body(null);
-    return ResponseEntity.status(HttpStatus.ACCEPTED).body(response);
+    return ResponseEntity.status(HttpStatus.ACCEPTED).body(authService.login(loginRequest));
   }
 }

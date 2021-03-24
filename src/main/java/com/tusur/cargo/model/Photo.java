@@ -21,4 +21,8 @@ public class Photo {
 
   @NotBlank
   private String link;
+
+  public Photo(@NotBlank String link) {
+    this.link = link;
+  }
 }

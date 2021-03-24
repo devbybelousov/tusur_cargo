@@ -28,20 +28,21 @@ public class UserPrincipal implements UserDetails {
     this.email = email;
     this.password = password;
     this.authorities = authorities;
+    this.enabled = enabled;
   }
 
-public static UserPrincipal create(User user){
-List<GrantedAuthority> authorityList = Collections
-    .singletonList(new SimpleGrantedAuthority(user.getRole().getTitle()));
-  return new UserPrincipal(
-      user.getUserId(),
-      user.getName(),
-      user.getEmail(),
-      user.getPassword(),
-      user.getEnabled(),
-      authorityList
-  );
-}
+  public static UserPrincipal create(User user) {
+    List<GrantedAuthority> authorityList = Collections
+        .singletonList(new SimpleGrantedAuthority(user.getRole().getTitle()));
+    return new UserPrincipal(
+        user.getUserId(),
+        user.getName(),
+        user.getEmail(),
+        user.getPassword(),
+        user.getEnabled(),
+        authorityList
+    );
+  }
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {

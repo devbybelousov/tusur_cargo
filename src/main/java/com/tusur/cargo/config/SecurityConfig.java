@@ -1,5 +1,6 @@
 package com.tusur.cargo.config;
 
+import com.tusur.cargo.properties.MailProperties;
 import com.tusur.cargo.security.JwtAuthenticationEntryPoint;
 import com.tusur.cargo.security.JwtAuthenticationFilter;
 import java.util.Properties;
@@ -24,10 +25,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @AllArgsConstructor
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   private final UserDetailsService userDetailsService;
-  private JwtAuthenticationEntryPoint unauthorizedHandler;
+  private final JwtAuthenticationEntryPoint unauthorizedHandler;
+  private final MailProperties mailProperties;
 
   @Bean
   public JwtAuthenticationFilter jwtAuthenticationFilter() {
@@ -46,10 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
-        .antMatchers("/api/auth/*")
-        .permitAll()
-        .anyRequest()
-        .authenticated();
+        .antMatchers("/api/auth/*", "/api/auth/accountVerification/*").permitAll()
+        .anyRequest().authenticated();
     http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
   }
 
@@ -74,17 +75,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
   @Bean
   public JavaMailSender javaMailSender() {
     JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-    mailSender.setHost("smtp.mailtrap.io");
-    mailSender.setPort(2525);
+    mailSender.setHost(mailProperties.getHost());
+    mailSender.setPort(mailProperties.getPort());
 
-    mailSender.setUsername("2bf476315f5e79");
-    mailSender.setPassword("68048bda733595");
+    mailSender.setUsername(mailProperties.getUser());
+    mailSender.setPassword(mailProperties.getPassword());
 
     Properties props = mailSender.getJavaMailProperties();
-    props.put("mail.transport.protocol", "smtp");
-    props.put("mail.smtp.auth", "true");
-    props.put("mail.smtp.starttls.enable", "true");
-    props.put("mail.debug", "true");
+    props.put("mail.transport.protocol", mailProperties.getProtocol());
+    props.put("mail.smtp.auth", mailProperties.getAuth());
+    props.put("mail.smtp.starttls.enable", mailProperties.getStarttls());
+    props.put("mail.debug", mailProperties.getDebug());
 
     return mailSender;
   }
