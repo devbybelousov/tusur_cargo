@@ -59,7 +59,7 @@ URL             |Тип|Описание                 |
 
 
 ## Запросы
-### api/auth/sign-in (POST)
+### api/auth/sign-in (POST) <a name="api/auth/signin-(POST)"></a>
 Авторизация пользователя
 * Тело: 
     * **email** (_строка_) - логин пользователя
