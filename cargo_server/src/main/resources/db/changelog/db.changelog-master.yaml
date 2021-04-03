@@ -1,0 +1,393 @@
+databaseChangeLog:
+- changeSet:
+    id: 1617427236385-1
+    author: dbelo (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: feedback_id
+            type: BIGINT
+        - column:
+            name: author_id
+            type: BIGINT
+        - column:
+            name: author_name
+            type: VARCHAR(50)
+        - column:
+            name: content
+            type: VARCHAR(255)
+        - column:
+            name: created
+            type: datetime
+        - column:
+            constraints:
+              nullable: false
+            name: rating
+            type: DOUBLE
+        - column:
+            name: user_id
+            type: BIGINT
+        tableName: feedback
+- changeSet:
+    id: 1617427236385-2
+    author: dbelo (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: order_id
+            type: BIGINT
+        - column:
+            name: address_recipient
+            type: VARCHAR(255)
+        - column:
+            name: address_sender
+            type: VARCHAR(255)
+        - column:
+            name: arrival_date
+            type: datetime
+        - column:
+            name: created
+            type: datetime
+        - column:
+            name: depart_date
+            type: datetime
+        - column:
+            name: description
+            type: VARCHAR(255)
+        - column:
+            constraints:
+              nullable: false
+            name: price
+            type: INT
+        - column:
+            name: title
+            type: VARCHAR(255)
+        - column:
+            name: type
+            type: VARCHAR(255)
+        - column:
+            name: size_id
+            type: BIGINT
+        - column:
+            name: user_id
+            type: BIGINT
+        - column:
+            name: size_size_id
+            type: BIGINT
+        tableName: orders
+- changeSet:
+    id: 1617427236385-3
+    author: dbelo (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: photo_id
+            type: BIGINT
+        - column:
+            name: link
+            type: VARCHAR(255)
+        - column:
+            name: order_id
+            type: BIGINT
+        tableName: photo
+- changeSet:
+    id: 1617427236385-4
+    author: dbelo (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: BIGINT
+        - column:
+            name: order_order_id
+            type: BIGINT
+        - column:
+            name: recipient_user_id
+            type: BIGINT
+        - column:
+            name: user_id
+            type: BIGINT
+        tableName: recipient_message
+- changeSet:
+    id: 1617427236385-5
+    author: dbelo (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: role_id
+            type: BIGINT
+        - column:
+            name: title
+            type: VARCHAR(255)
+        tableName: role
+- changeSet:
+    id: 1617427236385-6
+    author: dbelo (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: size_id
+            type: BIGINT
+        - column:
+            constraints:
+              nullable: false
+            name: height
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: length
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: weight
+            type: INT
+        - column:
+            constraints:
+              nullable: false
+            name: width
+            type: INT
+        tableName: size
+- changeSet:
+    id: 1617427236385-7
+    author: dbelo (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: BIGINT
+        - column:
+            name: token
+            type: VARCHAR(255)
+        - column:
+            name: user_id
+            type: BIGINT
+        tableName: token
+- changeSet:
+    id: 1617427236385-8
+    author: dbelo (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: user_id
+            type: BIGINT
+        - column:
+            name: email
+            type: VARCHAR(50)
+        - column:
+            name: enabled
+            type: BIT(1)
+        - column:
+            name: name
+            type: VARCHAR(50)
+        - column:
+            name: password
+            type: VARCHAR(255)
+        - column:
+            name: role_id
+            type: BIGINT
+        - column:
+            name: is_non_locked
+            type: BIT(1)
+        - column:
+            constraints:
+              nullable: false
+            name: rating
+            type: DOUBLE
+        tableName: user
+- changeSet:
+    id: 1617427236385-9
+    author: dbelo (generated)
+    changes:
+    - loadData:
+        columns:
+        - column:
+            header: role_id
+            name: role_id
+            type: NUMERIC
+        - column:
+            header: title
+            name: title
+            type: STRING
+        commentLineStartsWith: '#'
+        encoding: UTF-8
+        file: classpath:db/changelog/data/role.csv
+        quotchar: '"'
+        separator: ','
+        tableName: role
+- changeSet:
+    id: 1617427236385-10
+    author: dbelo (generated)
+    changes:
+    - loadData:
+        columns:
+        - column:
+            header: user_id
+            name: user_id
+            type: NUMERIC
+        - column:
+            header: email
+            name: email
+            type: STRING
+        - column:
+            header: enabled
+            name: enabled
+            type: BOOLEAN
+        - column:
+            header: name
+            name: name
+            type: STRING
+        - column:
+            header: password
+            name: password
+            type: STRING
+        - column:
+            header: role_id
+            name: role_id
+            type: NUMERIC
+        - column:
+            header: is_non_locked
+            name: is_non_locked
+            type: skip
+        - column:
+            header: rating
+            name: rating
+            type: NUMERIC
+        commentLineStartsWith: '#'
+        encoding: UTF-8
+        file: classpath:db/changelog/data/user.csv
+        quotchar: '"'
+        separator: ','
+        tableName: user
+- changeSet:
+    id: 1617427236385-11
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: size_id
+        indexName: FK6qic6vg8mrs7gi4kip3e1gt07
+        tableName: orders
+- changeSet:
+    id: 1617427236385-12
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: user_id
+        indexName: FK79keudebybjlldk2o4i0nwqev
+        tableName: token
+- changeSet:
+    id: 1617427236385-13
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: user_id
+        indexName: FK7k33yw505d347mw3avr93akao
+        tableName: feedback
+- changeSet:
+    id: 1617427236385-14
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: user_id
+        indexName: FK7p0hp3hqvwt7gx0aeee2bq6ck
+        tableName: recipient_message
+- changeSet:
+    id: 1617427236385-15
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: order_order_id
+        indexName: FKaoi7ws9m87lj0rn07xe2dnkb7
+        tableName: recipient_message
+- changeSet:
+    id: 1617427236385-16
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: user_id
+        indexName: FKel9kyl84ego2otj2accfd8mr7
+        tableName: orders
+- changeSet:
+    id: 1617427236385-17
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: order_id
+        indexName: FKfeel4c7se3rsqqxiug6m1983x
+        tableName: photo
+- changeSet:
+    id: 1617427236385-18
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: recipient_user_id
+        indexName: FKh9yd1vioioq3c30r5auxilkrk
+        tableName: recipient_message
+- changeSet:
+    id: 1617427236385-19
+    author: dbelo (generated)
+    changes:
+    - createIndex:
+        columns:
+        - column:
+            name: role_id
+        indexName: FKs2ym81xl98n65ndx09xpwxm66
+        tableName: user
+

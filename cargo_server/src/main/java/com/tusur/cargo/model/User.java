@@ -55,9 +55,17 @@ public class User {
   private Boolean enabled;
   @JsonIgnore
   private Boolean isNonLocked;
+  private double rating;
 
   @OneToMany
+  @JsonIgnore
+  @JoinColumn(name = "userId", referencedColumnName = "userId")
   private List<RecipientMessage> recipients;
+
+  @OneToMany
+  @JsonIgnore
+  @JoinColumn(name = "userId", referencedColumnName = "userId")
+  private List<Feedback> feedbackList;
 
   public User(String email, String password, String name, boolean enabled) {
     this.email = email;

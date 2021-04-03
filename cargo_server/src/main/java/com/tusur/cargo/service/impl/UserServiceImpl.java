@@ -1,10 +1,14 @@
 package com.tusur.cargo.service.impl;
 
+import com.tusur.cargo.dto.RecipientMessageRequest;
 import com.tusur.cargo.dto.SignupRequest;
 import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.model.Feedback;
+import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.RecipientMessage;
 import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
+import com.tusur.cargo.repository.OrderRepository;
 import com.tusur.cargo.repository.RecipientMessageRepository;
 import com.tusur.cargo.repository.RoleRepository;
 import com.tusur.cargo.repository.UserRepository;
@@ -26,6 +30,7 @@ public class UserServiceImpl implements UserService {
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
   private final RecipientMessageRepository messageRepository;
+  private final OrderRepository orderRepository;
 
   @Override
   @Transactional
@@ -103,8 +108,32 @@ public class UserServiceImpl implements UserService {
   public List<User> getAllUsersByCurrentUser(Long id) {
     User user = userRepository.findByUserId(id)
         .orElseThrow(() -> new SpringCargoException("User not found with id - " + id));
-    return messageRepository.findAllByRecipient(user).stream().map(RecipientMessage::getRecipient)
-        .collect(
-            Collectors.toList());
+    return user.getRecipients().stream().map(RecipientMessage::getRecipient)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Feedback> getAllUsersFeedback(Long id) {
+    User user = userRepository.findByUserId(id)
+        .orElseThrow(() -> new SpringCargoException("User not found with id - " + id));
+    return user.getFeedbackList();
+  }
+
+  @Override
+  public short createRecipientMessage(RecipientMessageRequest messageRequest) {
+    User user = userRepository.findByUserId(messageRequest.getUserId())
+        .orElse(null);
+    User recipient = userRepository.findByUserId(messageRequest.getRecipientId())
+        .orElse(null);
+    if (user == null || recipient == null) {
+      return 2;
+    }
+    Order order = orderRepository.findById(messageRequest.getOrderId()).orElse(null);
+    if (order == null) {
+      return 9;
+    }
+    user.getRecipients().add(messageRepository.save(new RecipientMessage(recipient, order)));
+    userRepository.save(user);
+    return 1;
   }
 }

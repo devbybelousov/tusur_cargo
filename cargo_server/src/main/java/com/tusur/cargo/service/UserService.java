@@ -1,6 +1,8 @@
 package com.tusur.cargo.service;
 
+import com.tusur.cargo.dto.RecipientMessageRequest;
 import com.tusur.cargo.dto.SignupRequest;
+import com.tusur.cargo.model.Feedback;
 import com.tusur.cargo.model.User;
 import java.util.List;
 
@@ -19,4 +21,8 @@ public interface UserService {
   short banUser(Long id);
 
   List<User> getAllUsersByCurrentUser(Long id);
+
+  List<Feedback> getAllUsersFeedback(Long id);
+
+  short createRecipientMessage(RecipientMessageRequest messageRequest);
 }

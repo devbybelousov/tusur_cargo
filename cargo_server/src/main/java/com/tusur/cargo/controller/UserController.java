@@ -1,5 +1,6 @@
 package com.tusur.cargo.controller;
 
+import com.tusur.cargo.dto.RecipientMessageRequest;
 import com.tusur.cargo.dto.SignupRequest;
 import com.tusur.cargo.service.UserService;
 import javax.validation.Valid;
@@ -10,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +29,27 @@ public class UserController {
   @GetMapping("/info")
   public ResponseEntity<?> getUserInfo(@RequestParam Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfo(id));
+  }
+
+  @GetMapping("/feedback")
+  public ResponseEntity<?> getUserFeedback(@RequestParam Long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsersFeedback(id));
+  }
+
+  @GetMapping("/recipient")
+  public ResponseEntity<?> getUserRecipients(@RequestParam Long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsersByCurrentUser(id));
+  }
+
+  @PostMapping("/recipient")
+  public ResponseEntity<?> addUserRecipient(@RequestBody RecipientMessageRequest messageRequest) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(userService.createRecipientMessage(messageRequest));
+  }
+
+  @PostMapping
+  public ResponseEntity<?> createUser(@RequestBody @Valid SignupRequest signupRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(signupRequest));
   }
 
   @GetMapping("/ban")
