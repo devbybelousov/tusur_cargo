@@ -35,7 +35,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
   @Override
   public List<ChatMessage> findChatMessages(Long senderId, Long recipientId) {
-    var chatId = chatRoomService.getChatId(senderId, recipientId, true);
+    var chatId = chatRoomService.getChatId(senderId, recipientId, false);
 
     var messages =
         chatId.map(messageRepository::findByChatId).orElse(new ArrayList<>());
@@ -62,7 +62,7 @@ public class ChatMessageServiceImpl implements ChatMessageService {
   @Override
   public void updateStatus(Long senderId, Long recipientId, String status) {
     messageRepository.findAllBySenderIdAndRecipientIdAndStatus(senderId, recipientId,
-        MessageStatus.RECEIVED.toString()).stream().forEach(chatMessage -> {
+        MessageStatus.RECEIVED.toString()).forEach(chatMessage -> {
           chatMessage.setStatus(status);
           messageRepository.save(chatMessage);
     });

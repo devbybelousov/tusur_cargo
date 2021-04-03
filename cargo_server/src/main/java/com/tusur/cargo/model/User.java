@@ -56,6 +56,9 @@ public class User {
   @JsonIgnore
   private Boolean isNonLocked;
 
+  @OneToMany
+  private List<RecipientMessage> recipients;
+
   public User(String email, String password, String name, boolean enabled) {
     this.email = email;
     this.password = password;

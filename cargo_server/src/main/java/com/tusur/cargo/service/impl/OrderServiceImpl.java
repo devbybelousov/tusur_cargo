@@ -91,7 +91,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public short updateStatus(Long id) {
+  public short updateStatus(Long id, String status) {
     return 0;
   }
 }

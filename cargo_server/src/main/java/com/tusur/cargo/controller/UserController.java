@@ -36,7 +36,7 @@ public class UserController {
   }
 
   @GetMapping
-  //@PreAuthorize("hasAuthority('ADMIN')")
+  @PreAuthorize("hasAuthority('ADMIN')")
   public ResponseEntity<?> getAllUser() {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser());
   }

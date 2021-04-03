@@ -16,5 +16,5 @@ public interface OrderService {
 
   short deleteOrder(Long id);
 
-  short updateStatus(Long id);
+  short updateStatus(Long id, String status);
 }

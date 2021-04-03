@@ -29,7 +29,7 @@ public class ChatController {
         .getChatId(
             chatMessage.getSenderId(),
             chatMessage.getRecipientId(),
-            chatRoomService.existChatRoom(
+            !chatRoomService.existChatRoom(
                 chatMessage.getSenderId(),
                 chatMessage.getRecipientId()));
     chatMessage.setChatId(chatId.get());

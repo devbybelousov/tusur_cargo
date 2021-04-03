@@ -23,7 +23,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
         .findBySenderIdAndRecipientId(senderId, recipientId)
         .map(ChatRoom::getChatId)
         .or(() -> {
-          if (createIfNotExist) {
+          if (!createIfNotExist) {
             return Optional.empty();
           }
           var chatId =

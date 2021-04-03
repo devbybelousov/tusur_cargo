@@ -1,12 +1,16 @@
 package com.tusur.cargo.service.impl;
 
 import com.tusur.cargo.dto.SignupRequest;
+import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.model.RecipientMessage;
 import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
+import com.tusur.cargo.repository.RecipientMessageRepository;
 import com.tusur.cargo.repository.RoleRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.service.UserService;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -21,6 +25,7 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
+  private final RecipientMessageRepository messageRepository;
 
   @Override
   @Transactional
@@ -38,9 +43,13 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public short editUser(SignupRequest signupRequest, Long id) {
     User user = userRepository.findByUserId(id).orElse(null);
-    if (user == null) return 2;
+    if (user == null) {
+      return 2;
+    }
     Role role = roleRepository.findByTitle(signupRequest.getRole()).orElse(null);
-    if (role == null) return 4;
+    if (role == null) {
+      return 4;
+    }
     user.setName(signupRequest.getName());
     user.setEmail(signupRequest.getEmail());
     user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
@@ -59,7 +68,9 @@ public class UserServiceImpl implements UserService {
         passwordEncoder.encode(signupRequest.getPassword()),
         signupRequest.getName(), true);
     Role role = roleRepository.findByTitle(signupRequest.getRole()).orElse(null);
-    if (role == null) return 4;
+    if (role == null) {
+      return 4;
+    }
     user.setRole(role);
     userRepository.save(user);
     return 1;
@@ -69,7 +80,9 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public short deleteUser(Long id) {
     User user = userRepository.findByUserId(id).orElse(null);
-    if (user == null) return 2;
+    if (user == null) {
+      return 2;
+    }
     userRepository.delete(user);
     return 1;
   }
@@ -78,7 +91,9 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public short banUser(Long id) {
     User user = userRepository.findByUserId(id).orElse(null);
-    if (user == null) return 2;
+    if (user == null) {
+      return 2;
+    }
     user.setIsNonLocked(false);
     userRepository.save(user);
     return 1;
@@ -86,7 +101,10 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public List<User> getAllUsersByCurrentUser(Long id) {
-
-    return null;
+    User user = userRepository.findByUserId(id)
+        .orElseThrow(() -> new SpringCargoException("User not found with id - " + id));
+    return messageRepository.findAllByRecipient(user).stream().map(RecipientMessage::getRecipient)
+        .collect(
+            Collectors.toList());
   }
 }
