@@ -1,2 +1,2 @@
-"user_id","email","enabled","name","password","role_id","created","is_non_locked","rating","role_role_id"
-"1","user@gmail.com","true","Oleg","$2a$10$TnKXH4IFelPwJ.IL3Vq9YuXTAQ8tq7v1f7kHIs8ssgTUAtjWuPY0G","3","NULL","NULL","0.0","NULL"
+"user_id","email","enabled","is_non_locked","name","password","rating","role_role_id"
+"1","admin@gmail.com","true","true","Администратор","$2a$10$PQes/WIiyJs9CeiGoO.XCOyQROXbgM1l1hNjY310gk70EWPc6dnwi","0.0","1"

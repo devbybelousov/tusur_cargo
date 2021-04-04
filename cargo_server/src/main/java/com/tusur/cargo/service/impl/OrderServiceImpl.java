@@ -87,11 +87,22 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   public short deleteOrder(Long id) {
-    return 0;
+    Order order = orderRepository.findById(id).orElse(null);
+    if (order == null) {
+      return 9;
+    }
+    orderRepository.delete(order);
+    return 1;
   }
 
   @Override
   public short updateStatus(Long id, String status) {
-    return 0;
+    Order order = orderRepository.findById(id).orElse(null);
+    if (order == null) {
+      return 9;
+    }
+    order.setStatus(status);
+    orderRepository.save(order);
+    return 1;
   }
 }

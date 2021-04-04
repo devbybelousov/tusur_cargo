@@ -73,7 +73,9 @@
 		<dependency>
 			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
+			<version>4.3.2</version>
 		</dependency>
+
   </dependencies>
 
 </project>

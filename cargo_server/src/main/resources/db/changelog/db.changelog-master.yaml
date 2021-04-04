@@ -1,6 +1,6 @@
 databaseChangeLog:
 - changeSet:
-    id: 1617427236385-1
+    id: 1617546076969-1
     author: dbelo (generated)
     changes:
     - createTable:
@@ -34,7 +34,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: feedback
 - changeSet:
-    id: 1617427236385-2
+    id: 1617546076969-2
     author: dbelo (generated)
     changes:
     - createTable:
@@ -59,6 +59,9 @@ databaseChangeLog:
             name: created
             type: datetime
         - column:
+            name: status
+            type: VARCHAR(50)
+        - column:
             name: depart_date
             type: datetime
         - column:
@@ -76,17 +79,14 @@ databaseChangeLog:
             name: type
             type: VARCHAR(255)
         - column:
-            name: size_id
+            name: size_size_id
             type: BIGINT
         - column:
             name: user_id
             type: BIGINT
-        - column:
-            name: size_size_id
-            type: BIGINT
         tableName: orders
 - changeSet:
-    id: 1617427236385-3
+    id: 1617546076969-3
     author: dbelo (generated)
     changes:
     - createTable:
@@ -106,7 +106,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: photo
 - changeSet:
-    id: 1617427236385-4
+    id: 1617546076969-4
     author: dbelo (generated)
     changes:
     - createTable:
@@ -129,7 +129,7 @@ databaseChangeLog:
             type: BIGINT
         tableName: recipient_message
 - changeSet:
-    id: 1617427236385-5
+    id: 1617546076969-5
     author: dbelo (generated)
     changes:
     - createTable:
@@ -146,7 +146,7 @@ databaseChangeLog:
             type: VARCHAR(255)
         tableName: role
 - changeSet:
-    id: 1617427236385-6
+    id: 1617546076969-6
     author: dbelo (generated)
     changes:
     - createTable:
@@ -180,7 +180,7 @@ databaseChangeLog:
             type: INT
         tableName: size
 - changeSet:
-    id: 1617427236385-7
+    id: 1617546076969-7
     author: dbelo (generated)
     changes:
     - createTable:
@@ -196,11 +196,11 @@ databaseChangeLog:
             name: token
             type: VARCHAR(255)
         - column:
-            name: user_id
+            name: user_user_id
             type: BIGINT
         tableName: token
 - changeSet:
-    id: 1617427236385-8
+    id: 1617546076969-8
     author: dbelo (generated)
     changes:
     - createTable:
@@ -214,30 +214,30 @@ databaseChangeLog:
             type: BIGINT
         - column:
             name: email
-            type: VARCHAR(50)
+            type: VARCHAR(255)
         - column:
             name: enabled
             type: BIT(1)
         - column:
+            name: is_non_locked
+            type: BIT(1)
+        - column:
             name: name
-            type: VARCHAR(50)
+            type: VARCHAR(255)
         - column:
             name: password
             type: VARCHAR(255)
-        - column:
-            name: role_id
-            type: BIGINT
-        - column:
-            name: is_non_locked
-            type: BIT(1)
         - column:
             constraints:
               nullable: false
             name: rating
             type: DOUBLE
+        - column:
+            name: role_role_id
+            type: BIGINT
         tableName: user
 - changeSet:
-    id: 1617427236385-9
+    id: 1617546076969-9
     author: dbelo (generated)
     changes:
     - loadData:
@@ -257,7 +257,31 @@ databaseChangeLog:
         separator: ','
         tableName: role
 - changeSet:
-    id: 1617427236385-10
+    id: 1617546076969-10
+    author: dbelo (generated)
+    changes:
+    - loadData:
+        columns:
+        - column:
+            header: id
+            name: id
+            type: NUMERIC
+        - column:
+            header: token
+            name: token
+            type: STRING
+        - column:
+            header: user_user_id
+            name: user_user_id
+            type: NUMERIC
+        commentLineStartsWith: '#'
+        encoding: UTF-8
+        file: classpath:db/changelog/data/token.csv
+        quotchar: '"'
+        separator: ','
+        tableName: token
+- changeSet:
+    id: 1617546076969-11
     author: dbelo (generated)
     changes:
     - loadData:
@@ -275,6 +299,10 @@ databaseChangeLog:
             name: enabled
             type: BOOLEAN
         - column:
+            header: is_non_locked
+            name: is_non_locked
+            type: BOOLEAN
+        - column:
             header: name
             name: name
             type: STRING
@@ -283,16 +311,12 @@ databaseChangeLog:
             name: password
             type: STRING
         - column:
-            header: role_id
-            name: role_id
-            type: NUMERIC
-        - column:
-            header: is_non_locked
-            name: is_non_locked
-            type: skip
-        - column:
             header: rating
             name: rating
+            type: NUMERIC
+        - column:
+            header: role_role_id
+            name: role_role_id
             type: NUMERIC
         commentLineStartsWith: '#'
         encoding: UTF-8
@@ -301,27 +325,27 @@ databaseChangeLog:
         separator: ','
         tableName: user
 - changeSet:
-    id: 1617427236385-11
+    id: 1617546076969-12
     author: dbelo (generated)
     changes:
     - createIndex:
         columns:
         - column:
-            name: size_id
+            name: size_size_id
         indexName: FK6qic6vg8mrs7gi4kip3e1gt07
         tableName: orders
 - changeSet:
-    id: 1617427236385-12
+    id: 1617546076969-13
     author: dbelo (generated)
     changes:
     - createIndex:
         columns:
         - column:
-            name: user_id
+            name: user_user_id
         indexName: FK79keudebybjlldk2o4i0nwqev
         tableName: token
 - changeSet:
-    id: 1617427236385-13
+    id: 1617546076969-14
     author: dbelo (generated)
     changes:
     - createIndex:
@@ -331,7 +355,7 @@ databaseChangeLog:
         indexName: FK7k33yw505d347mw3avr93akao
         tableName: feedback
 - changeSet:
-    id: 1617427236385-14
+    id: 1617546076969-15
     author: dbelo (generated)
     changes:
     - createIndex:
@@ -341,7 +365,7 @@ databaseChangeLog:
         indexName: FK7p0hp3hqvwt7gx0aeee2bq6ck
         tableName: recipient_message
 - changeSet:
-    id: 1617427236385-15
+    id: 1617546076969-16
     author: dbelo (generated)
     changes:
     - createIndex:
@@ -351,7 +375,7 @@ databaseChangeLog:
         indexName: FKaoi7ws9m87lj0rn07xe2dnkb7
         tableName: recipient_message
 - changeSet:
-    id: 1617427236385-16
+    id: 1617546076969-17
     author: dbelo (generated)
     changes:
     - createIndex:
@@ -361,7 +385,7 @@ databaseChangeLog:
         indexName: FKel9kyl84ego2otj2accfd8mr7
         tableName: orders
 - changeSet:
-    id: 1617427236385-17
+    id: 1617546076969-18
     author: dbelo (generated)
     changes:
     - createIndex:
@@ -371,7 +395,7 @@ databaseChangeLog:
         indexName: FKfeel4c7se3rsqqxiug6m1983x
         tableName: photo
 - changeSet:
-    id: 1617427236385-18
+    id: 1617546076969-19
     author: dbelo (generated)
     changes:
     - createIndex:
@@ -381,13 +405,13 @@ databaseChangeLog:
         indexName: FKh9yd1vioioq3c30r5auxilkrk
         tableName: recipient_message
 - changeSet:
-    id: 1617427236385-19
+    id: 1617546076969-20
     author: dbelo (generated)
     changes:
     - createIndex:
         columns:
         - column:
-            name: role_id
+            name: role_role_id
         indexName: FKs2ym81xl98n65ndx09xpwxm66
         tableName: user
 

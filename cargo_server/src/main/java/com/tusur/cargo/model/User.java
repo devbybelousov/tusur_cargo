@@ -49,8 +49,6 @@ public class User {
   @JoinColumn(name = "userId", referencedColumnName = "userId")
   private List<Order> orders;
 
-  private Instant created;
-
   @JsonIgnore
   private Boolean enabled;
   @JsonIgnore
