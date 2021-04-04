@@ -1,5 +1,6 @@
 package com.tusur.cargo.service;
 
+import com.tusur.cargo.dto.AdminRequest;
 import com.tusur.cargo.dto.RecipientMessageRequest;
 import com.tusur.cargo.dto.SignupRequest;
 import com.tusur.cargo.model.Feedback;
@@ -15,6 +16,8 @@ public interface UserService {
   short editUser(SignupRequest signupRequest, Long id);
 
   short createUser(SignupRequest signupRequest);
+
+  short createAdmin(AdminRequest adminRequest);
 
   short deleteUser(Long id);
 

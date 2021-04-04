@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -21,6 +22,7 @@ public class FeedbackServiceImpl implements FeedbackService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public short create(FeedbackRequest feedbackRequest) {
 
     User user = userRepository.findByUserId(feedbackRequest.getUserId()).orElse(null);
@@ -47,6 +49,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 
   @Override
+  @Transactional
   public short delete(Long id) {
     Feedback feedback = feedbackRepository.findById(id).orElse(null);
     if (feedback == null) return 10;

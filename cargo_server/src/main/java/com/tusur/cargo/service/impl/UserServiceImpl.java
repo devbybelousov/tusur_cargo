@@ -1,5 +1,7 @@
 package com.tusur.cargo.service.impl;
 
+import com.tusur.cargo.dto.AdminRequest;
+import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.dto.RecipientMessageRequest;
 import com.tusur.cargo.dto.SignupRequest;
 import com.tusur.cargo.exception.SpringCargoException;
@@ -12,7 +14,9 @@ import com.tusur.cargo.repository.OrderRepository;
 import com.tusur.cargo.repository.RecipientMessageRepository;
 import com.tusur.cargo.repository.RoleRepository;
 import com.tusur.cargo.repository.UserRepository;
+import com.tusur.cargo.service.AuthService;
 import com.tusur.cargo.service.UserService;
+import com.tusur.cargo.service.mail.MailService;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -31,6 +35,8 @@ public class UserServiceImpl implements UserService {
   private final PasswordEncoder passwordEncoder;
   private final RecipientMessageRepository messageRepository;
   private final OrderRepository orderRepository;
+  private final AuthService authService;
+  private final MailService mailService;
 
   @Override
   @Transactional
@@ -80,6 +86,33 @@ public class UserServiceImpl implements UserService {
     userRepository.save(user);
     return 1;
   }
+
+  @Override
+  @Transactional
+  public short createAdmin(AdminRequest adminRequest) {
+    if (userRepository.existsByEmail(adminRequest.getEmail())) {
+      return 3;
+    }
+    User user = new User(adminRequest.getEmail(),
+        passwordEncoder.encode(adminRequest.getPassword()),
+        "Администратор", true);
+    Role role = roleRepository.findByTitle("ADMIN").orElse(null);
+    if (role == null) {
+      return 4;
+    }
+    user.setRole(role);
+    userRepository.save(user);
+    String token = authService.generateVerificationToken(user);
+    mailService
+        .sendMail(new NotificationEmail("Пожалуйста, подтвердите свой аккаунт",
+            user.getEmail(),
+            "Поздравляем Вы новый администратор CarGoBob, " +
+                "пожалуйста, нажмите на ссылку чтобы подтвердить свой аккаунт: " +
+                "http://localhost:8080/api/auth/accountVerification/" + token + "\n Ваш пароль для входа в аккаунт: "
+                + adminRequest.getPassword()));
+    return 1;
+  }
+
 
   @Override
   @Transactional

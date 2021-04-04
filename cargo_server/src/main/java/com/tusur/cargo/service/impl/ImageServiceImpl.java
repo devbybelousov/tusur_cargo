@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -28,6 +29,7 @@ public class ImageServiceImpl implements ImageService {
         .collect(Collectors.toList());
   }
 
+  @Transactional
   private Long uploadImage(MultipartFile file) {
     String fileName = storageService.store(file);
     String URL_IMAGE = "http://localhost:8080/api/image/";

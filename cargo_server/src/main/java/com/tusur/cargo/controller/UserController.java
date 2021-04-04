@@ -1,5 +1,6 @@
 package com.tusur.cargo.controller;
 
+import com.tusur.cargo.dto.AdminRequest;
 import com.tusur.cargo.dto.RecipientMessageRequest;
 import com.tusur.cargo.dto.SignupRequest;
 import com.tusur.cargo.service.UserService;
@@ -48,8 +49,9 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<?> createUser(@RequestBody @Valid SignupRequest signupRequest) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(signupRequest));
+  @PreAuthorize("hasAuthority('SUPER_ADMIN')")
+  public ResponseEntity<?> createAdmin(@RequestBody @Valid AdminRequest adminRequest) {
+    return ResponseEntity.status(HttpStatus.CREATED).body(userService.createAdmin(adminRequest));
   }
 
   @GetMapping("/ban")

@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @AllArgsConstructor
@@ -26,6 +27,7 @@ public class OrderServiceImpl implements OrderService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public short createOrder(OrderRequest orderRequest) {
     Order order = new Order(
         orderRequest.getType(),
@@ -86,6 +88,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public short deleteOrder(Long id) {
     Order order = orderRepository.findById(id).orElse(null);
     if (order == null) {
@@ -96,6 +99,7 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
+  @Transactional
   public short updateStatus(Long id, String status) {
     Order order = orderRepository.findById(id).orElse(null);
     if (order == null) {
