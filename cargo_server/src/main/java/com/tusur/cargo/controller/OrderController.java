@@ -1,6 +1,7 @@
 package com.tusur.cargo.controller;
 
 import com.tusur.cargo.dto.OrderRequest;
+import com.tusur.cargo.enumiration.OrderType;
 import com.tusur.cargo.service.OrderService;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -30,14 +31,27 @@ public class OrderController {
         .body(orderService.createOrder(orderRequest));
   }
 
-  @GetMapping
-  public ResponseEntity<?> getAllOrders() {
-    return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrder());
+  @GetMapping("/cargo")
+  @PreAuthorize("hasAuthority('USER')")
+  public ResponseEntity<?> getAllOrdersByCargo() {
+    return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrderByType(OrderType.CARGO.toString()));
+  }
+
+  @GetMapping("/carrier")
+  @PreAuthorize("hasAuthority('USER')")
+  public ResponseEntity<?> getAllOrdersByCarrier() {
+    return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrderByType(OrderType.CARRIER.toString()));
   }
 
   @GetMapping("/info")
   public ResponseEntity<?> getOrderById(@RequestParam("id") Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrder(id));
+  }
+
+  @GetMapping("/checked")
+  @PreAuthorize("hasAuthority('ADMIN')")
+  public ResponseEntity<?> getOrderByStatusChecked(){
+    return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrderByStatusChecked());
   }
 
   @DeleteMapping

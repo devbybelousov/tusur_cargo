@@ -7,7 +7,6 @@ import com.tusur.cargo.repository.FeedbackRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.service.FeedbackService;
 import java.time.Instant;
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

@@ -56,7 +56,9 @@ URL                                                                             
 [api/user/recipient](#api/user/recipient-(GET))                                    |GET     |Получить всех получателей                  |
 [api/user/recipient](#api/user/recipient-(POST))                                   |POST    |Добавить получателя                        |
 [api/order](#api/order-(POST))                                                     |POST    |Создание объявления                        |
-[api/order](#api/order-(GET))                                                      |GET     |Получить все объявления                    |   
+[api/order/cargo](#api/order/cargo-(GET))                                          |GET     |Получить все объявления по грузу           |  
+[api/order/carrier](#api/order/carrier-(GET))                                      |GET     |Получить все объявления по перевозчикам    |  
+[api/order/checked](#api/order/checked-(GET))                                      |GET     |Получить все объявления для модерации      |  
 [api/order](#api/order-(PUT))                                                      |PUT     |Редактирование объявления                  |
 [api/order](#api/order-(DELETE))                                                   |DELETE  |Удалить объявление                         |
 [api/order/status](#api/order/status-(PUT))                                        |PUT     |Обновить статус объявления                 |
@@ -192,8 +194,16 @@ URL                                                                             
     * **imagesId** (_строка_) - массив идентификаторов изображений.
 * Результат: После успешного выполнения возвращает 1.
 
-### api/order (GET) <a name="api/order-(GET)"></a>
-Получить все объявления
+### api/order/cargo (GET) <a name="api/order/cargo-(GET)"></a>
+Получить все объявления по грузам
+* Результат: После успешного выполнения возвращает массив объектов, описывающих объявление.
+
+### api/order/carrier (GET) <a name="api/order/carrier-(GET)"></a>
+Получить все объявления по перевозчикам
+* Результат: После успешного выполнения возвращает массив объектов, описывающих объявление.
+
+### api/order/checked (GET) <a name="api/order/checked-(GET)"></a>
+Получить все объявления для модерации
 * Результат: После успешного выполнения возвращает массив объектов, описывающих объявление.
 
 ### api/order/info (GET) <a name="api/order/info-(GET)"></a>

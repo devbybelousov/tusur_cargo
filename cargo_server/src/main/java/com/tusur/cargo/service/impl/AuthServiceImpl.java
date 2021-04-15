@@ -17,7 +17,6 @@ import com.tusur.cargo.service.mail.MailService;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -38,9 +37,6 @@ public class AuthServiceImpl implements AuthService {
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
   private final RoleRepository roleRepository;
-
-  @Value("${app.clientHost}")
-  private String clientHost;
 
   /* Регистрация пользователя */
   @Transactional
@@ -71,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
             user.getEmail(),
             "Спасибо, что зарегистрировались на CarGoBob, " +
                 "пожалуйста, нажмите на ссылку чтобы подтвердить свой аккаунт: " +
-                clientHost +
+                "http://localhost:8080" +
                 "/api/auth/accountVerification/" + token));
     return 1;
   }
@@ -125,7 +121,7 @@ public class AuthServiceImpl implements AuthService {
             user.getEmail(),
             "Если вы забыли пароль от аккаунта CarGoBob, " +
                 "пожалуйста, нажмите на ссылку: " +
-                clientHost +
+                "http://localhost:8080" +
                 "/api/auth/forgot/" + token));
     return 1;
   }

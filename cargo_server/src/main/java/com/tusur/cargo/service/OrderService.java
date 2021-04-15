@@ -8,7 +8,9 @@ public interface OrderService {
 
   short createOrder(OrderRequest orderRequest);
 
-  List<Order> getAllOrder();
+  List<Order> getAllOrderByType(String type);
+
+  List<Order> getAllOrderByStatusChecked();
 
   Order getOrder(Long id);
 

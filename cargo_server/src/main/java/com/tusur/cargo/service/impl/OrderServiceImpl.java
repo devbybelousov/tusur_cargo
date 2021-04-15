@@ -1,6 +1,7 @@
 package com.tusur.cargo.service.impl;
 
 import com.tusur.cargo.dto.OrderRequest;
+import com.tusur.cargo.enumiration.OrderStatus;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.repository.OrderRepository;
@@ -43,6 +44,7 @@ public class OrderServiceImpl implements OrderService {
             .map(photoRepository::findByPhotoId)
             .collect(Collectors.toList()));
 
+    order.setStatus(OrderStatus.CHECKED.toString());
     String email = SecurityContextHolder.getContext().getAuthentication().getName();
     User user = userRepository.findByEmail(email).orElse(null);
     if (user == null) {
@@ -56,8 +58,13 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public List<Order> getAllOrder() {
-    return orderRepository.findAll();
+  public List<Order> getAllOrderByType(String type) {
+    return orderRepository.findAllByTypeOrderByCreated(type);
+  }
+
+  @Override
+  public List<Order> getAllOrderByStatusChecked() {
+    return orderRepository.findAllByStatusOrderByCreated(OrderStatus.CHECKED.toString());
   }
 
   @Override
@@ -72,6 +79,7 @@ public class OrderServiceImpl implements OrderService {
       return 9;
     }
 
+    oldOrder.setStatus(OrderStatus.CHECKED.toString());
     oldOrder.setType(orderRequest.getType());
     oldOrder.setTitle(orderRequest.getTitle());
     oldOrder.setDescription(orderRequest.getDescription());

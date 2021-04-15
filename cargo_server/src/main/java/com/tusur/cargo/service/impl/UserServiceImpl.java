@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,8 +41,6 @@ public class UserServiceImpl implements UserService {
   private final AuthService authService;
   private final MailService mailService;
   private final VerificationTokenRepository tokenRepository;
-  @Value("${app.clientHost}")
-  private String clientHost;
 
 
   /* Получение информации о пользователе*/
@@ -70,7 +69,7 @@ public class UserServiceImpl implements UserService {
             email,
             "Если это вы изменили почту на CarGoBob, " +
                 "пожалуйста, нажмите на ссылку чтобы подтвердить новую почту: " +
-                clientHost +
+                "http://localhost:8080" +
                 "/api/user/accountVerification/" + token));
 
     return 1;
@@ -143,7 +142,7 @@ public class UserServiceImpl implements UserService {
             user.getEmail(),
             "Поздравляем Вы новый администратор CarGoBob, " +
                 "пожалуйста, нажмите на ссылку чтобы подтвердить свой аккаунт: " +
-                clientHost +
+                "http://localhost:8080" +
                 "/api/auth/accountVerification/" + token + "\n Ваш пароль для входа в аккаунт: "
                 + adminRequest.getPassword()));
     return 1;
