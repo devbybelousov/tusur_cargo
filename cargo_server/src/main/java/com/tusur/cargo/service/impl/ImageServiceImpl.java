@@ -30,7 +30,7 @@ public class ImageServiceImpl implements ImageService {
   }
 
   @Transactional
-  private Long uploadImage(MultipartFile file) {
+  public Long uploadImage(MultipartFile file) {
     String fileName = storageService.store(file);
     String URL_IMAGE = "http://localhost:8080/api/image/";
     return photoRepository.save(new Photo(URL_IMAGE + fileName)).getPhotoId();

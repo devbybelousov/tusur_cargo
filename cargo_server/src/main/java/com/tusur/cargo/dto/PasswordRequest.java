@@ -1,6 +1,5 @@
 package com.tusur.cargo.dto;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -10,12 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminRequest {
+public class PasswordRequest {
 
   @NotBlank
-  @Email
-  private String email;
+  @Size(min = 6, max = 12)
+  private String oldPassword;
   @NotBlank
   @Size(min = 6, max = 12)
-  private String password;
+  private String newPassword;
+  private Long id;
 }

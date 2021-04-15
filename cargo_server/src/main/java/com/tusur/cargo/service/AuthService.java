@@ -14,5 +14,22 @@ public interface AuthService {
   short verifyAccount(String token);
 
   AuthenticationResponse login(LoginRequest loginRequest);
+
+  short forgotPassword(String email);
+
+  short changePassword(String password, String token);
+
+  static boolean checkPassword(String password) {
+    String specialSymbols = "#$%^*+.=?@_!-<>";
+    String letter = "abcdefghijklmnoprstquvwxyz";
+    String numbers = "0123456789";
+    for (char c : password.toCharArray()) {
+      if (!letter.contains(String.valueOf(c)) && !numbers.contains(String.valueOf(c))
+          && !specialSymbols.contains(String.valueOf(c))) {
+        return false;
+      }
+    }
+    return true;
+  }
 }
 

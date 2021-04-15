@@ -18,14 +18,10 @@ public class SignupRequest {
   private String email;
 
   @NotBlank(message = "Password is required")
-  @Size(min = 6, max = 20)
+  @Size(min = 6, max = 12)
   private String password;
 
   @NotBlank(message = "Name is required")
   @Size(max = 30)
   private String name;
-
-  @NotBlank(message = "Role is required")
-  @Size(max = 20)
-  private String role;
 }

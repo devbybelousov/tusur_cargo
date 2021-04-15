@@ -13,9 +13,13 @@ public interface UserService {
 
   List<User> getAllUser();
 
-  short editUser(SignupRequest signupRequest, Long id);
+  short editEmail(String email, Long id);
 
-  short createUser(SignupRequest signupRequest);
+  short verifyEmail(String token);
+
+  short editName (String name, Long id);
+
+  short editPassword (String oldPassword, String newPassword, Long id);
 
   short createAdmin(AdminRequest adminRequest);
 
