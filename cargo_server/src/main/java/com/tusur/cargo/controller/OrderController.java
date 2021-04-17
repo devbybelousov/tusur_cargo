@@ -1,10 +1,20 @@
 package com.tusur.cargo.controller;
 
+import com.tusur.cargo.dto.OrderPagingResponse;
 import com.tusur.cargo.dto.OrderRequest;
-import com.tusur.cargo.enumiration.OrderType;
+import com.tusur.cargo.dto.PagingHeaders;
+import com.tusur.cargo.model.Order;
 import com.tusur.cargo.service.OrderService;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.In;
+import net.kaczmarzyk.spring.data.jpa.domain.Like;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,27 +42,42 @@ public class OrderController {
         .body(orderService.createOrder(orderRequest));
   }
 
-  @GetMapping("/cargo")
-  @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<?> getAllOrdersByCargo() {
-    return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrderByType(OrderType.CARGO.toString()));
+  @GetMapping
+  public ResponseEntity<?> getAllOrder(@And({
+      @Spec(path = "title", params = "title", spec = Like.class),
+      @Spec(path = "addressSender", params = "addressSender", spec = Like.class),
+      @Spec(path = "addressRecipient", params = "addressRecipient", spec = In.class),
+      @Spec(path = "type", params = "type", spec = Equal.class),
+      @Spec(path = "price", params = "price", spec = Equal.class),
+      @Spec(path = "departDate", params = "departDate", spec = Equal.class),
+      @Spec(path = "arrivalDate", params = "arrivalDate", spec = Equal.class),
+      @Spec(path = "created", params = "created", spec = Equal.class),
+      @Spec(path = "size.width", params = "width", spec = Equal.class),
+      @Spec(path = "size.height", params = "height", spec = Equal.class),
+      @Spec(path = "size.length", params = "length", spec = Equal.class),
+      @Spec(path = "size.weight", params = "weight", spec = Equal.class),
+      @Spec(path = "status", params = "status", spec = Equal.class)})
+      Specification<Order> spec,
+      Sort sort,
+      @RequestHeader HttpHeaders httpHeaders) {
+    final OrderPagingResponse response = orderService.getAllOrder(spec, httpHeaders, sort);
+    return ResponseEntity.status(HttpStatus.OK).headers(returnHttpHeaders(response))
+        .body(response.getElements());
   }
 
-  @GetMapping("/carrier")
-  @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<?> getAllOrdersByCarrier() {
-    return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrderByType(OrderType.CARRIER.toString()));
+  public HttpHeaders returnHttpHeaders(OrderPagingResponse response) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.set(PagingHeaders.COUNT.getName(), String.valueOf(response.getCount()));
+    headers.set(PagingHeaders.PAGE_SIZE.getName(), String.valueOf(response.getPageSize()));
+    headers.set(PagingHeaders.PAGE_OFFSET.getName(), String.valueOf(response.getPageOffset()));
+    headers.set(PagingHeaders.PAGE_NUMBER.getName(), String.valueOf(response.getPageNumber()));
+    headers.set(PagingHeaders.PAGE_TOTAL.getName(), String.valueOf(response.getPageTotal()));
+    return headers;
   }
 
   @GetMapping("/info")
   public ResponseEntity<?> getOrderById(@RequestParam("id") Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrder(id));
-  }
-
-  @GetMapping("/checked")
-  @PreAuthorize("hasAuthority('ADMIN')")
-  public ResponseEntity<?> getOrderByStatusChecked(){
-    return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrderByStatusChecked());
   }
 
   @DeleteMapping
@@ -62,12 +88,14 @@ public class OrderController {
 
   @PutMapping
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<?> updateOrder(@RequestBody @Valid OrderRequest orderRequest, @RequestParam("id") Long id) {
+  public ResponseEntity<?> updateOrder(@RequestBody @Valid OrderRequest orderRequest,
+      @RequestParam("id") Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.editOrder(orderRequest, id));
   }
 
   @PutMapping("/status")
-  public ResponseEntity<?> updateStatus(@RequestParam("status") String status, @RequestParam("id") Long id) {
+  public ResponseEntity<?> updateStatus(@RequestParam("status") String status,
+      @RequestParam("id") Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.updateStatus(id, status));
   }
 

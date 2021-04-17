@@ -16,7 +16,7 @@ http://localhost:8080/api/user/info?id=2
 # Запуск
 Для разработки запускать в конфигурации:
 ```
---spring.profiles.active=client
+--spring.profiles.active=dev
 ```
 
 # Сборка
@@ -56,8 +56,7 @@ URL                                                                             
 [api/user/recipient](#api/user/recipient-(GET))                                    |GET     |Получить всех получателей                  |
 [api/user/recipient](#api/user/recipient-(POST))                                   |POST    |Добавить получателя                        |
 [api/order](#api/order-(POST))                                                     |POST    |Создание объявления                        |
-[api/order/cargo](#api/order/cargo-(GET))                                          |GET     |Получить все объявления по грузу           |  
-[api/order/carrier](#api/order/carrier-(GET))                                      |GET     |Получить все объявления по перевозчикам    |  
+[api/order/cargo](#api/order/cargo-(GET))                                          |GET     |Получить все объявления                    |
 [api/order/checked](#api/order/checked-(GET))                                      |GET     |Получить все объявления для модерации      |  
 [api/order](#api/order-(PUT))                                                      |PUT     |Редактирование объявления                  |
 [api/order](#api/order-(DELETE))                                                   |DELETE  |Удалить объявление                         |
@@ -194,17 +193,40 @@ URL                                                                             
     * **imagesId** (_строка_) - массив идентификаторов изображений.
 * Результат: После успешного выполнения возвращает 1.
 
-### api/order/cargo (GET) <a name="api/order/cargo-(GET)"></a>
-Получить все объявления по грузам
+### api/order (GET) <a name="api/order-(GET)"></a>
+Получить все объявления
+Параметры для фильтрации:
+  * **title** (_строка_) - название объявления
+  * **type** (_строка_) - тип объявления:
+    * _CARGO_
+    * _CARRIER_
+  * **addressSender** (_строка_) - адрес отправления
+  * **addressRecipient** (_строка_) - адрес получение
+  * **price** (_положительное число_) - цена
+  * **departDate** (_строка_) - дата отправления
+  * **arrivalDate** (_строка_) - дата получения
+  * **size** (_объект_) - объект с размерами:
+    *  **width** (_положительное число_) - ширина
+    *  **height** (_положительное число_) - высота
+    *  **length** (_положительное число_) - длина
+    *  **weight** (_положительное число_) - вес
+  * **status** (_строка_) - статус объявления:
+    * _CHECKED_ 
+    * _INACTIVE_ 
+    * _ACTIVE_ 
+Параметры для сортировки:
+    * **departDate** (_строка_) - дата отправления
+    * **arrivalDate** (_строка_) - дата получения
+    * **size** (_объект_) - объект с размерами:
+        *  **width** (_положительное число_) - ширина
+        *  **height** (_положительное число_) - высота
+        *  **length** (_положительное число_) - длина
+        *  **weight** (_положительное число_) - вес
 * Результат: После успешного выполнения возвращает массив объектов, описывающих объявление.
-
-### api/order/carrier (GET) <a name="api/order/carrier-(GET)"></a>
-Получить все объявления по перевозчикам
-* Результат: После успешного выполнения возвращает массив объектов, описывающих объявление.
-
-### api/order/checked (GET) <a name="api/order/checked-(GET)"></a>
-Получить все объявления для модерации
-* Результат: После успешного выполнения возвращает массив объектов, описывающих объявление.
+* Пример:  
+```http request
+http://localhost:8080/api/order?sort=departDate, asc&weight=12
+```
 
 ### api/order/info (GET) <a name="api/order/info-(GET)"></a>
 Получить информацию об объявлении
