@@ -122,7 +122,7 @@ public class AuthServiceImpl implements AuthService {
             "Если вы забыли пароль от аккаунта CarGoBob, " +
                 "пожалуйста, нажмите на ссылку: " +
                 "http://localhost:8080" +
-                "/api/auth/forgot/" + token));
+                "/api/auth/recovery/" + token));
     return 1;
   }
 

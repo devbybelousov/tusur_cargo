@@ -45,9 +45,9 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.OK).body(authService.forgotPassword(email));
   }
 
-  @GetMapping("/recovery/{token}")
+  @GetMapping("/recovery")
   public ResponseEntity<?> recovery(@RequestParam @Size(max = 12, min = 6) String password,
-      @PathVariable(name = "token") String token) {
+      @RequestParam(name = "token") String token) {
     return ResponseEntity.status(HttpStatus.OK).body(authService.changePassword(password, token));
   }
 }
