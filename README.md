@@ -56,8 +56,7 @@ URL                                                                             
 [api/user/recipient](#api/user/recipient-(GET))                                    |GET     |Получить всех получателей                  |
 [api/user/recipient](#api/user/recipient-(POST))                                   |POST    |Добавить получателя                        |
 [api/order](#api/order-(POST))                                                     |POST    |Создание объявления                        |
-[api/order/cargo](#api/order/cargo-(GET))                                          |GET     |Получить все объявления                    |
-[api/order/checked](#api/order/checked-(GET))                                      |GET     |Получить все объявления для модерации      |  
+[api/order](#api/order-(GET))                                                      |GET     |Получить все объявления                    |
 [api/order](#api/order-(PUT))                                                      |PUT     |Редактирование объявления                  |
 [api/order](#api/order-(DELETE))                                                   |DELETE  |Удалить объявление                         |
 [api/order/status](#api/order/status-(PUT))                                        |PUT     |Обновить статус объявления                 |
