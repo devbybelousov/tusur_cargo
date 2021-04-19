@@ -29,6 +29,7 @@ public class Feedback {
   private String authorName;
   private double rating;
   private String content;
+  private Long orderId;
   private Instant created;
 
 }

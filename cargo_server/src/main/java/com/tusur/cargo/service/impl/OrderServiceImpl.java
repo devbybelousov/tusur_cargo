@@ -4,6 +4,7 @@ import com.tusur.cargo.dto.OrderPagingResponse;
 import com.tusur.cargo.dto.OrderRequest;
 import com.tusur.cargo.dto.PagingHeaders;
 import com.tusur.cargo.enumiration.OrderStatus;
+import com.tusur.cargo.exception.SpringCargoException;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.repository.OrderRepository;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,11 +69,6 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  public List<Order> getAllOrderByType(String type) {
-    return orderRepository.findAllByTypeOrderByCreated(type);
-  }
-
-  @Override
   public OrderPagingResponse getAllOrder(Specification<Order> spec, HttpHeaders headers,
       Sort sort) {
     if (isRequestPaged(headers)) {
@@ -94,6 +91,22 @@ public class OrderServiceImpl implements OrderService {
     return orderRepository.findAll(spec, sort);
   }
 
+  @Override
+  @Transactional
+  public short changeStatusOrder(Long id, String status) {
+    Order order = orderRepository.findById(id).orElseThrow(() -> new SpringCargoException("Order not found"));
+    order.setStatus(status);
+
+    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+    String email = auth.getName();
+    User user = userRepository.findByEmail(email).orElseThrow(() -> new SpringCargoException("User not found"));
+
+    user.getOrders().add(orderRepository.save(order));
+    if (status.equals(OrderStatus.ACTIVE.toString())) user.setCountAccept(user.getCountAccept() + 1);
+    else user.setCountRefused(user.getCountRefused() + 1);
+    return 1;
+  }
+
   private boolean isRequestPaged(HttpHeaders headers){
     return headers.containsKey(PagingHeaders.PAGE_NUMBER.getName()) && headers.containsKey(PagingHeaders.PAGE_SIZE.getName());
   }
@@ -103,11 +116,6 @@ public class OrderServiceImpl implements OrderService {
         Objects.requireNonNull(headers.get(PagingHeaders.PAGE_NUMBER.getName())).get(0));
     int size = Integer.parseInt(Objects.requireNonNull(headers.get(PagingHeaders.PAGE_SIZE.getName())).get(0));
     return PageRequest.of(page, size, sort);
-  }
-
-  @Override
-  public List<Order> getAllOrderByStatusChecked() {
-    return orderRepository.findAllByStatusOrderByCreated(OrderStatus.CHECKED.toString());
   }
 
   @Override
@@ -150,13 +158,12 @@ public class OrderServiceImpl implements OrderService {
   }
 
   @Override
-  @Transactional
-  public short updateStatus(Long id, String status) {
+  public short completeOrder(Long id) {
     Order order = orderRepository.findById(id).orElse(null);
     if (order == null) {
       return 9;
     }
-    order.setStatus(status);
+    order.setStatus(OrderStatus.INACTIVE.toString());
     orderRepository.save(order);
     return 1;
   }

@@ -3,13 +3,25 @@ package com.tusur.cargo.controller;
 import com.tusur.cargo.dto.AdminRequest;
 import com.tusur.cargo.dto.PasswordRequest;
 import com.tusur.cargo.dto.RecipientMessageRequest;
+import com.tusur.cargo.dto.UserResponse;
+import com.tusur.cargo.model.Order;
+import com.tusur.cargo.model.User;
 import com.tusur.cargo.service.UserService;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
+import net.kaczmarzyk.spring.data.jpa.domain.In;
+import net.kaczmarzyk.spring.data.jpa.domain.Like;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
+import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +31,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,22 +66,29 @@ public class UserController {
         .body(userService.createRecipientMessage(messageRequest));
   }
 
-  @PostMapping("/admin")
-  @PreAuthorize("hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> createAdmin(@RequestBody @Valid AdminRequest adminRequest) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(userService.createAdmin(adminRequest));
-  }
-
   @GetMapping("/ban")
-  @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
+  @PreAuthorize("hasAuthority('SUPER_ADMIN')")
   public ResponseEntity<?> banUser(@RequestParam Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(userService.banUser(id));
   }
 
   @GetMapping
   @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> getAllUser() {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser());
+  public ResponseEntity<?> getAllUser(@And({
+      @Spec(path = "email", params = "email", spec = Like.class),
+      @Spec(path = "name", params = "name", spec = Like.class),
+      @Spec(path = "role.title", params = "role", spec = Like.class)})
+      Specification<User> spec,
+      Sort sort) {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser(spec, sort).stream().map(
+        user -> new UserResponse(
+            user.getUserId(),
+            user.getName(),
+            user.getEmail(),
+            user.getOrders().size(),
+            user.getFeedbackList().size(),
+            user.getRating()))
+        .collect(Collectors.toList()));
   }
 
   @PutMapping("/password")
@@ -85,10 +105,10 @@ public class UserController {
         .body(userService.editEmail(email, id));
   }
 
-  @PutMapping("/email/{token}")
-  public ResponseEntity<?> verifyEmail(@PathVariable("token") String token) {
+  @GetMapping("/email/{email}/{token}")
+  public ResponseEntity<?> verifyEmail(@PathVariable("token") String token, @PathVariable("email") String email) {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(userService.verifyEmail(token));
+        .body(userService.verifyEmail(token, email));
   }
 
   @PutMapping("/name")

@@ -1,8 +1,8 @@
 package com.tusur.cargo.service.impl;
 
-import com.tusur.cargo.dto.AdminRequest;
 import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.dto.RecipientMessageRequest;
+import com.tusur.cargo.dto.UserResponse;
 import com.tusur.cargo.exception.SpringCargoException;
 import com.tusur.cargo.model.Feedback;
 import com.tusur.cargo.model.Order;
@@ -22,8 +22,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,9 +35,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserServiceImpl implements UserService {
 
   private final UserRepository userRepository;
-  private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
   private final RecipientMessageRepository messageRepository;
+  private final RoleRepository roleRepository;
   private final OrderRepository orderRepository;
   private final AuthService authService;
   private final MailService mailService;
@@ -53,8 +54,8 @@ public class UserServiceImpl implements UserService {
 
   /* Получение всех пользователей*/
   @Override
-  public List<User> getAllUser() {
-    return userRepository.findAll();
+  public List<User> getAllUser(Specification<User> spec, Sort sort) {
+    return userRepository.findAll(spec, sort);
   }
 
   /* Редактирование почты*/
@@ -66,28 +67,25 @@ public class UserServiceImpl implements UserService {
     String token = authService.generateVerificationToken(user);
     mailService
         .sendMail(new NotificationEmail("Пожалуйста, подтвердите новую почту",
-            email,
+            user.getEmail(),
             "Если это вы изменили почту на CarGoBob, " +
                 "пожалуйста, нажмите на ссылку чтобы подтвердить новую почту: " +
                 "http://localhost:8080" +
-                "/api/user/accountVerification/" + token));
+                "/api/user/email/" + email + "/" + token));
 
     return 1;
   }
 
   @Override
   @Transactional
-  public short verifyEmail(String token) {
+  public short verifyEmail(String token, String newEmail) {
     VerificationToken verificationToken = tokenRepository.findByToken(token)
         .orElseThrow(() -> new SpringCargoException("Invalid token."));
     String email = verificationToken.getUser().getEmail();
     User user = userRepository.findByEmail(email)
-        .orElse(null);
-    if (user == null) {
-      log.warn("User not found with email - " + email);
-      return 2;
-    }
-    user.setEnabled(true);
+        .orElseThrow(
+            () -> new SpringCargoException("User not found with email-" + email));
+    user.setEmail(newEmail);
     userRepository.save(user);
     return 1;
   }
@@ -111,43 +109,17 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findByUserId(id)
         .orElseThrow(
             () -> new SpringCargoException("User not found with id-" + id));
-    if (!user.getPassword().equals(passwordEncoder.encode(oldPassword))) {
-      throw new SpringCargoException("New password is incorrect");
+    if (user.getPassword().equals(passwordEncoder.encode(oldPassword)) && oldPassword
+        .equals(newPassword)) {
+      throw new SpringCargoException("Old password is incorrect");
     }
     if (!AuthService.checkPassword(newPassword)) {
       throw new SpringCargoException("New password is incorrect");
     }
-    user.setPassword(newPassword);
+    user.setPassword(passwordEncoder.encode(newPassword));
     userRepository.save(user);
     return 1;
   }
-
-  /* Создание администратора*/
-  @Override
-  @Transactional
-  public short createAdmin(AdminRequest adminRequest) {
-    if (userRepository.existsByEmail(adminRequest.getEmail())) {
-      return 3;
-    }
-    User user = new User(adminRequest.getEmail(),
-        passwordEncoder.encode(adminRequest.getPassword()),
-        "Администратор", true);
-    Role role = roleRepository.findByTitle("ADMIN")
-        .orElseThrow(() -> new SpringCargoException("Role not found"));
-    user.setRole(role);
-    userRepository.save(user);
-    String token = authService.generateVerificationToken(user);
-    mailService
-        .sendMail(new NotificationEmail("Пожалуйста, подтвердите свой аккаунт",
-            user.getEmail(),
-            "Поздравляем Вы новый администратор CarGoBob, " +
-                "пожалуйста, нажмите на ссылку чтобы подтвердить свой аккаунт: " +
-                "http://localhost:8080" +
-                "/api/auth/accountVerification/" + token + "\n Ваш пароль для входа в аккаунт: "
-                + adminRequest.getPassword()));
-    return 1;
-  }
-
 
   /* Удаление пользователя */
   @Override
@@ -191,7 +163,7 @@ public class UserServiceImpl implements UserService {
     return user.getFeedbackList();
   }
 
-  /* Добавления пользователю собеседника */
+  /* Добавления собеседника */
   @Override
   public short createRecipientMessage(RecipientMessageRequest messageRequest) {
     User user = userRepository.findByUserId(messageRequest.getUserId())

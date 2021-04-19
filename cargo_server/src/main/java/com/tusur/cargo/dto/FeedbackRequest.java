@@ -24,4 +24,5 @@ public class FeedbackRequest {
   @Size(max = 150)
   private String content;
   private Long userId;
+  private Long orderId;
 }

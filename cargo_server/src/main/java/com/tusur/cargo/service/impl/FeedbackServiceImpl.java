@@ -30,6 +30,7 @@ public class FeedbackServiceImpl implements FeedbackService {
     Feedback feedback = Feedback.builder()
         .authorId(feedbackRequest.getAuthorId())
         .authorName(feedbackRequest.getAuthorName())
+        .orderId(feedbackRequest.getOrderId())
         .content(feedbackRequest.getContent())
         .rating(feedbackRequest.getRating())
         .created(Instant.now())
@@ -51,7 +52,7 @@ public class FeedbackServiceImpl implements FeedbackService {
   @Transactional
   public short delete(Long id) {
     Feedback feedback = feedbackRepository.findById(id).orElse(null);
-    if (feedback == null) return 10;
+    if (feedback == null) return -1;
     feedbackRepository.delete(feedback);
     return 1;
   }

@@ -3,6 +3,7 @@ package com.tusur.cargo.controller;
 import com.tusur.cargo.dto.OrderPagingResponse;
 import com.tusur.cargo.dto.OrderRequest;
 import com.tusur.cargo.dto.PagingHeaders;
+import com.tusur.cargo.enumiration.OrderStatus;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.service.OrderService;
 import javax.validation.Valid;
@@ -93,10 +94,22 @@ public class OrderController {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.editOrder(orderRequest, id));
   }
 
-  @PutMapping("/status")
-  public ResponseEntity<?> updateStatus(@RequestParam("status") String status,
-      @RequestParam("id") Long id) {
-    return ResponseEntity.status(HttpStatus.OK).body(orderService.updateStatus(id, status));
+  @GetMapping("/accept")
+  @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
+  public ResponseEntity<?> acceptOrder(@RequestParam Long id){
+    return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(id, OrderStatus.ACTIVE.toString()));
+  }
+
+  @GetMapping("/reject")
+  @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
+  public ResponseEntity<?> rejectOrder(@RequestParam Long id){
+    return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(id, OrderStatus.REFUSED.toString()));
+  }
+
+  @GetMapping("/complete")
+  @PreAuthorize("hasAuthority('USER')")
+  public ResponseEntity<?> completeStatus(@RequestParam("id") Long id) {
+    return ResponseEntity.status(HttpStatus.OK).body(orderService.completeOrder(id));
   }
 
 

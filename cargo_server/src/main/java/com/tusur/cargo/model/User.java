@@ -51,9 +51,16 @@ public class User {
 
   @JsonIgnore
   private Boolean enabled;
+
   @JsonIgnore
   private Boolean isNonLocked;
   private double rating;
+
+  @JsonIgnore
+  private int countAccept;
+
+  @JsonIgnore
+  private int countRefused;
 
   @OneToMany
   @JsonIgnore

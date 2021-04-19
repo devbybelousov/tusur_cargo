@@ -13,15 +13,13 @@ public interface OrderService {
 
   short createOrder(OrderRequest orderRequest);
 
-  List<Order> getAllOrderByType(String type);
-
   OrderPagingResponse getAllOrder(Specification<Order> spec, HttpHeaders headers, Sort sort);
 
   OrderPagingResponse getAllOrder(Specification<Order> spec, Pageable pageable);
 
   List<Order> getAllOrder(Specification<Order> spec, Sort sort);
 
-  List<Order> getAllOrderByStatusChecked();
+  short changeStatusOrder(Long id, String status);
 
   Order getOrder(Long id);
 
@@ -29,5 +27,5 @@ public interface OrderService {
 
   short deleteOrder(Long id);
 
-  short updateStatus(Long id, String status);
+  short completeOrder(Long id);
 }
