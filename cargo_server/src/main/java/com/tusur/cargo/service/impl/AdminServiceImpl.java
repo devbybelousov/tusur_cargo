@@ -40,7 +40,7 @@ public class AdminServiceImpl implements AdminService {
     }
     User user = new User(adminRequest.getEmail(),
         passwordEncoder.encode(adminRequest.getPassword()),
-        "Администратор", true);
+        "Администратор №" + (userRepository.countByNameLike("Администратор №") + 1), true);
     user.setIsNonLocked(true);
     Role role = roleRepository.findByTitle("ADMIN")
         .orElseThrow(() -> new SpringCargoException("Role not found"));
@@ -58,6 +58,7 @@ public class AdminServiceImpl implements AdminService {
     return 1;
   }
 
+  /* Получение всех администраторов */
   @Override
   public List<AdminResponse> getAllAdmin() {
     Role role = roleRepository.findByTitle("ADMIN")
