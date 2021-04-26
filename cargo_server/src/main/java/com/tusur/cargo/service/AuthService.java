@@ -7,6 +7,21 @@ import com.tusur.cargo.model.User;
 
 public interface AuthService {
 
+  static boolean checkPassword(String password) {
+    String specialSymbols = "#$%^*+.=?@_!-<>";
+    String letter = "abcdefghijklmnoprstquvwxyz";
+    String numbers = "0123456789";
+    for (char c : password.toCharArray()) {
+      if (!letter.contains(String.valueOf(c)) &&
+          !numbers.contains(String.valueOf(c)) &&
+          !specialSymbols.contains(String.valueOf(c)) &&
+          !letter.toUpperCase().contains(String.valueOf(c))) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   short registerUser(SignupRequest signupRequest);
 
   String generateVerificationToken(User user);
@@ -18,18 +33,5 @@ public interface AuthService {
   short forgotPassword(String email);
 
   short changePassword(String password, String token);
-
-  static boolean checkPassword(String password) {
-    String specialSymbols = "#$%^*+.=?@_!-<>";
-    String letter = "abcdefghijklmnoprstquvwxyz";
-    String numbers = "0123456789";
-    for (char c : password.toCharArray()) {
-      if (!letter.contains(String.valueOf(c)) && !numbers.contains(String.valueOf(c))
-          && !specialSymbols.contains(String.valueOf(c))) {
-        return false;
-      }
-    }
-    return true;
-  }
 }
 

@@ -22,11 +22,11 @@ public class Size {
   private Long sizeId;
 
   @Max(10000)
-  private int width;
+  private double width;
   @Max(10000)
-  private int height;
+  private double height;
   @Max(10000)
-  private int length;
+  private double length;
   @Max(10000)
-  private int weight;
+  private double weight;
 }

@@ -4,7 +4,9 @@ import com.tusur.cargo.dto.AuthenticationResponse;
 import com.tusur.cargo.dto.LoginRequest;
 import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.dto.SignupRequest;
+import com.tusur.cargo.exception.PasswordException;
 import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.exception.UserException;
 import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.model.VerificationToken;
@@ -43,7 +45,7 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public short registerUser(SignupRequest signupRequest) {
     if (userRepository.existsByEmail(signupRequest.getEmail())) {
-      return -1;
+      throw new UserException("User already created.");
     }
 
     if (!AuthService.checkPassword(signupRequest.getPassword())) {
@@ -129,9 +131,9 @@ public class AuthServiceImpl implements AuthService {
   /* Подтверждение смены пароля*/
   @Override
   @Transactional
-  public short changePassword(String password, String token) {
+  public short changePassword(String password, String token) throws PasswordException {
     if (!AuthService.checkPassword(password)) {
-      return 11;
+      throw new PasswordException("Password is incorrect.");
     }
     VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
         .orElseThrow(() -> new SpringCargoException("Invalid token."));

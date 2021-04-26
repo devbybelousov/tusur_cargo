@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Builder
+@Builder(toBuilder = true)
 public class Feedback {
 
   @Id

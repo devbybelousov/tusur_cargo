@@ -1,6 +1,7 @@
 package com.tusur.cargo.service.impl;
 
 import com.tusur.cargo.dto.FeedbackRequest;
+import com.tusur.cargo.exception.SpringCargoException;
 import com.tusur.cargo.model.Feedback;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.repository.FeedbackRepository;
@@ -24,8 +25,9 @@ public class FeedbackServiceImpl implements FeedbackService {
   @Transactional
   public short create(FeedbackRequest feedbackRequest) {
 
-    User user = userRepository.findByUserId(feedbackRequest.getUserId()).orElse(null);
-    if (user == null) return 2;
+    User user = userRepository.findByUserId(feedbackRequest.getUserId())
+        .orElseThrow(() -> new SpringCargoException(
+            "User not found with id - " + feedbackRequest.getUserId()));
 
     Feedback feedback = Feedback.builder()
         .authorId(feedbackRequest.getAuthorId())
@@ -39,10 +41,10 @@ public class FeedbackServiceImpl implements FeedbackService {
     user.getFeedbackList().add(feedbackRepository.save(feedback));
 
     double rating = 0;
-    for (Feedback unit : user.getFeedbackList()){
+    for (Feedback unit : user.getFeedbackList()) {
       rating += unit.getRating();
     }
-    user.setRating(rating/user.getFeedbackList().size());
+    user.setRating(rating / user.getFeedbackList().size());
     userRepository.save(user);
     return 1;
   }
@@ -51,8 +53,8 @@ public class FeedbackServiceImpl implements FeedbackService {
   @Override
   @Transactional
   public short delete(Long id) {
-    Feedback feedback = feedbackRepository.findById(id).orElse(null);
-    if (feedback == null) return -1;
+    Feedback feedback = feedbackRepository.findById(id)
+        .orElseThrow(() -> new SpringCargoException("Feedback not found with id - " + id));
     feedbackRepository.delete(feedback);
     return 1;
   }

@@ -2,6 +2,8 @@ package com.tusur.cargo.controller;
 
 import com.tusur.cargo.dto.LoginRequest;
 import com.tusur.cargo.dto.SignupRequest;
+import com.tusur.cargo.exception.PasswordException;
+import com.tusur.cargo.exception.SpringCargoException;
 import com.tusur.cargo.service.AuthService;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -31,13 +33,13 @@ public class AuthController {
   }
 
   @GetMapping("/accountVerification/{token}")
-  public ResponseEntity<?> verifyAccount(@PathVariable(name = "token") String token) {
+  public ResponseEntity<?> verifyAccount(@PathVariable(name = "token") String token) throws SpringCargoException {
     return ResponseEntity.status(HttpStatus.OK).body(authService.verifyAccount(token));
   }
 
   @PostMapping("/sign-in")
   public ResponseEntity<?> loginUser(@RequestBody @Valid LoginRequest loginRequest) {
-    return ResponseEntity.status(HttpStatus.ACCEPTED).body(authService.login(loginRequest));
+    return ResponseEntity.status(HttpStatus.OK).body(authService.login(loginRequest));
   }
 
   @GetMapping("/forgot")
@@ -47,7 +49,7 @@ public class AuthController {
 
   @GetMapping("/recovery")
   public ResponseEntity<?> recovery(@RequestParam @Size(max = 12, min = 6) String password,
-      @RequestParam(name = "token") String token) {
+      @RequestParam(name = "token") String token) throws PasswordException {
     return ResponseEntity.status(HttpStatus.OK).body(authService.changePassword(password, token));
   }
 }

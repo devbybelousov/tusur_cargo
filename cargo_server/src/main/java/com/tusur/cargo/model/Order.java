@@ -15,6 +15,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Table(name = "orders")
+@Builder(toBuilder = true)
 public class Order {
 
   @Id
@@ -38,7 +40,7 @@ public class Order {
   private String description;
   private String addressSender;
   private String addressRecipient;
-  private int price;
+  private Double price;
   private Instant departDate;
   private Instant arrivalDate;
 
@@ -58,7 +60,7 @@ public class Order {
   private String status;
 
   public Order(String type, String title, String description, String addressSender,
-      String addressRecipient, int price, Instant departDate, Instant arrivalDate, Size size,
+      String addressRecipient, Double price, Instant departDate, Instant arrivalDate, Size size,
       List<Photo> photos) {
     this.type = type;
     this.title = title;
@@ -71,7 +73,7 @@ public class Order {
     this.size = size;
     this.photos = photos;
     created = Instant.now();
-    status = OrderStatus.CHECKED.toString();
+    status = OrderStatus.CHECK.toString();
   }
 }
 

@@ -4,6 +4,7 @@ import com.tusur.cargo.dto.OrderPagingResponse;
 import com.tusur.cargo.dto.OrderRequest;
 import com.tusur.cargo.dto.PagingHeaders;
 import com.tusur.cargo.enumiration.OrderStatus;
+import com.tusur.cargo.exception.SpringCargoException;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.service.OrderService;
 import javax.validation.Valid;
@@ -103,7 +104,8 @@ public class OrderController {
   @GetMapping("/reject")
   @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
   public ResponseEntity<?> rejectOrder(@RequestParam Long id){
-    return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(id, OrderStatus.REFUSED.toString()));
+    return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(id, OrderStatus.REFUSE
+        .toString()));
   }
 
   @GetMapping("/complete")

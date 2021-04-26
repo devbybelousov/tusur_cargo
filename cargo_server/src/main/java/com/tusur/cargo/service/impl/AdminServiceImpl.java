@@ -4,6 +4,7 @@ import com.tusur.cargo.dto.AdminRequest;
 import com.tusur.cargo.dto.AdminResponse;
 import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.exception.UserException;
 import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.repository.RoleRepository;
@@ -35,7 +36,7 @@ public class AdminServiceImpl implements AdminService {
   @Transactional
   public short createAdmin(AdminRequest adminRequest) {
     if (userRepository.existsByEmail(adminRequest.getEmail())) {
-      return -1;
+      throw new UserException("User already created.");
     }
     User user = new User(adminRequest.getEmail(),
         passwordEncoder.encode(adminRequest.getPassword()),

@@ -55,12 +55,10 @@ public class OrderServiceImpl implements OrderService {
             .map(photoRepository::findByPhotoId)
             .collect(Collectors.toList()));
 
-    order.setStatus(OrderStatus.CHECKED.toString());
+    order.setStatus(OrderStatus.CHECK.toString());
     String email = SecurityContextHolder.getContext().getAuthentication().getName();
-    User user = userRepository.findByEmail(email).orElse(null);
-    if (user == null) {
-      return 2;
-    }
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new SpringCargoException("User not found"));
 
     order.setUser(user);
     orderRepository.save(order);
@@ -83,7 +81,9 @@ public class OrderServiceImpl implements OrderService {
   public OrderPagingResponse getAllOrder(Specification<Order> spec, Pageable pageable) {
     Page<Order> page = orderRepository.findAll(spec, pageable);
     List<Order> content = page.getContent();
-    return new OrderPagingResponse(page.getTotalElements(), (long) page.getNumber(), (long) page.getNumberOfElements(), pageable.getOffset(), (long) page.getTotalPages(), content);
+    return new OrderPagingResponse(page.getTotalElements(), (long) page.getNumber(),
+        (long) page.getNumberOfElements(), pageable.getOffset(), (long) page.getTotalPages(),
+        content);
   }
 
   @Override
@@ -94,43 +94,49 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public short changeStatusOrder(Long id, String status) {
-    Order order = orderRepository.findById(id).orElseThrow(() -> new SpringCargoException("Order not found"));
+    Order order = orderRepository.findById(id)
+        .orElseThrow(() -> new SpringCargoException("Order not found"));
     order.setStatus(status);
 
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String email = auth.getName();
-    User user = userRepository.findByEmail(email).orElseThrow(() -> new SpringCargoException("User not found"));
+    User user = userRepository.findByEmail(email)
+        .orElseThrow(() -> new SpringCargoException("User not found"));
 
     user.getOrders().add(orderRepository.save(order));
-    if (status.equals(OrderStatus.ACTIVE.toString())) user.setCountAccept(user.getCountAccept() + 1);
-    else user.setCountRefused(user.getCountRefused() + 1);
+    if (status.equals(OrderStatus.ACTIVE.toString())) {
+      user.setCountAccept(user.getCountAccept() + 1);
+    } else {
+      user.setCountRefused(user.getCountRefused() + 1);
+    }
     return 1;
   }
 
-  private boolean isRequestPaged(HttpHeaders headers){
-    return headers.containsKey(PagingHeaders.PAGE_NUMBER.getName()) && headers.containsKey(PagingHeaders.PAGE_SIZE.getName());
+  private boolean isRequestPaged(HttpHeaders headers) {
+    return headers.containsKey(PagingHeaders.PAGE_NUMBER.getName()) && headers
+        .containsKey(PagingHeaders.PAGE_SIZE.getName());
   }
 
   private Pageable buildPageRequest(HttpHeaders headers, Sort sort) {
     int page = Integer.parseInt(
         Objects.requireNonNull(headers.get(PagingHeaders.PAGE_NUMBER.getName())).get(0));
-    int size = Integer.parseInt(Objects.requireNonNull(headers.get(PagingHeaders.PAGE_SIZE.getName())).get(0));
+    int size = Integer
+        .parseInt(Objects.requireNonNull(headers.get(PagingHeaders.PAGE_SIZE.getName())).get(0));
     return PageRequest.of(page, size, sort);
   }
 
   @Override
   public Order getOrder(Long id) {
-    return orderRepository.findById(id).orElse(new Order());
+    return orderRepository.findById(id)
+        .orElseThrow(() -> new SpringCargoException("Order not found."));
   }
 
   @Override
   public short editOrder(OrderRequest orderRequest, Long id) {
-    Order oldOrder = orderRepository.findById(id).orElse(null);
-    if (oldOrder == null) {
-      return 9;
-    }
+    Order oldOrder = orderRepository.findById(id)
+        .orElseThrow(() -> new SpringCargoException("Order not found."));
 
-    oldOrder.setStatus(OrderStatus.CHECKED.toString());
+    oldOrder.setStatus(OrderStatus.CHECK.toString());
     oldOrder.setType(orderRequest.getType());
     oldOrder.setTitle(orderRequest.getTitle());
     oldOrder.setDescription(orderRequest.getDescription());
@@ -149,20 +155,16 @@ public class OrderServiceImpl implements OrderService {
   @Override
   @Transactional
   public short deleteOrder(Long id) {
-    Order order = orderRepository.findById(id).orElse(null);
-    if (order == null) {
-      return 9;
-    }
+    Order order = orderRepository.findById(id)
+        .orElseThrow(() -> new SpringCargoException("Order not found."));
     orderRepository.delete(order);
     return 1;
   }
 
   @Override
   public short completeOrder(Long id) {
-    Order order = orderRepository.findById(id).orElse(null);
-    if (order == null) {
-      return 9;
-    }
+    Order order = orderRepository.findById(id)
+        .orElseThrow(() -> new SpringCargoException("Order not found."));
     order.setStatus(OrderStatus.INACTIVE.toString());
     orderRepository.save(order);
     return 1;

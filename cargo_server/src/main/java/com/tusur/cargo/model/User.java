@@ -16,6 +16,7 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder(toBuilder = true)
 public class User {
 
   @Id
@@ -73,6 +75,14 @@ public class User {
   private List<Feedback> feedbackList;
 
   public User(String email, String password, String name, boolean enabled) {
+    this.email = email;
+    this.password = password;
+    this.name = name;
+    this.enabled = enabled;
+  }
+
+  public User(Long id, String email, String password, String name, boolean enabled) {
+    this.userId = id;
     this.email = email;
     this.password = password;
     this.name = name;

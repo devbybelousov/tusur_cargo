@@ -26,10 +26,12 @@ public class OrderRequest {
   @javax.validation.constraints.Size(max = 30)
   private String type;
 
+  @javax.validation.constraints.Size(max = 100)
   private String addressSender;
+  @javax.validation.constraints.Size(max = 100)
   private String addressRecipient;
   @Max(1000000)
-  private int price;
+  private Double price;
   private Instant departDate;
   private Instant arrivalDate;
   @Valid

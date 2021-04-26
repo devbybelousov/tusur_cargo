@@ -3,6 +3,7 @@ package com.tusur.cargo.service.impl;
 import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.dto.RecipientMessageRequest;
 import com.tusur.cargo.dto.UserResponse;
+import com.tusur.cargo.exception.PasswordException;
 import com.tusur.cargo.exception.SpringCargoException;
 import com.tusur.cargo.model.Feedback;
 import com.tusur.cargo.model.Order;
@@ -37,12 +38,10 @@ public class UserServiceImpl implements UserService {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final RecipientMessageRepository messageRepository;
-  private final RoleRepository roleRepository;
   private final OrderRepository orderRepository;
   private final AuthService authService;
   private final MailService mailService;
   private final VerificationTokenRepository tokenRepository;
-
 
   /* Получение информации о пользователе*/
   @Override
@@ -76,6 +75,7 @@ public class UserServiceImpl implements UserService {
     return 1;
   }
 
+  /* Подтверждение почты */
   @Override
   @Transactional
   public short verifyEmail(String token, String newEmail) {
@@ -109,12 +109,12 @@ public class UserServiceImpl implements UserService {
     User user = userRepository.findByUserId(id)
         .orElseThrow(
             () -> new SpringCargoException("User not found with id-" + id));
-    if (user.getPassword().equals(passwordEncoder.encode(oldPassword)) && oldPassword
-        .equals(newPassword)) {
-      throw new SpringCargoException("Old password is incorrect");
+    if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+      throw new PasswordException("Old password is incorrect");
     }
-    if (!AuthService.checkPassword(newPassword)) {
-      throw new SpringCargoException("New password is incorrect");
+    if (!AuthService.checkPassword(newPassword) || oldPassword
+        .equals(newPassword)) {
+      throw new PasswordException("New password is incorrect");
     }
     user.setPassword(passwordEncoder.encode(newPassword));
     userRepository.save(user);
@@ -144,7 +144,7 @@ public class UserServiceImpl implements UserService {
     return 1;
   }
 
-  /* Получение всех пользователей-собеседников */
+  /* Получение всех собеседников */
   @Override
   public List<User> getAllUsersByCurrentUser(Long id) {
     User user = userRepository.findByUserId(id)
