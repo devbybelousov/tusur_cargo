@@ -15,20 +15,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Builder(toBuilder = true)
-public class RecipientMessage {
+public class Interlocutor {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   @OneToOne
-  private User recipient;
+  private User interlocutor;
 
   @OneToOne
   private Order order;
 
-  public RecipientMessage(User recipient, Order order) {
-    this.recipient = recipient;
+  public Interlocutor(User interlocutor, Order order) {
+    this.interlocutor = interlocutor;
     this.order = order;
   }
 }

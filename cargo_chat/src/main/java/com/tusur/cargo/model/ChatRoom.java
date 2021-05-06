@@ -22,5 +22,4 @@ public class ChatRoom {
   private String chatId;
   private Long senderId;
   private Long recipientId;
-  private Long order;
 }

@@ -7,9 +7,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RecipientMessageRequest {
+public class InterlocutorRequest {
 
   private Long userId;
   private Long orderId;
-  private Long recipientId;
+  private Long interlocutorId;
 }

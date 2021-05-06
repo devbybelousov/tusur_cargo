@@ -2,6 +2,7 @@ package com.tusur.cargo.service;
 
 import com.tusur.cargo.dto.OrderPagingResponse;
 import com.tusur.cargo.dto.OrderRequest;
+import com.tusur.cargo.enumeration.OrderStatus;
 import com.tusur.cargo.model.Order;
 import java.util.List;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ public interface OrderService {
 
   List<Order> getAllOrder(Specification<Order> spec, Sort sort);
 
-  short changeStatusOrder(Long id, String status);
+  short changeStatusOrder(Long id, OrderStatus status);
 
   Order getOrder(Long id);
 

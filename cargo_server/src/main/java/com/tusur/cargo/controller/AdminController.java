@@ -2,7 +2,7 @@ package com.tusur.cargo.controller;
 
 import com.tusur.cargo.dto.AdminRequest;
 import com.tusur.cargo.dto.AdminResponse;
-import com.tusur.cargo.enumiration.OrderStatus;
+import com.tusur.cargo.enumeration.OrderStatus;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.service.AdminService;
@@ -47,14 +47,23 @@ public class AdminController {
       @Spec(path = "role.title", params = "role", spec = Like.class)})
       Specification<User> spec,
       Sort sort) {
-    return ResponseEntity.status(HttpStatus.CREATED).body(userService.getAllUser(spec, sort).stream()
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUser(spec, sort).stream()
         .map(user -> new AdminResponse(
             user.getUserId(),
             user.getName(),
             user.getEmail(),
-            user.getCountAccept(),
-            user.getCountRefused(),
-            user.getCountAccept() + user.getCountRefused()))
+            countByStatus(user.getOrders(), OrderStatus.ACTIVE),
+            countByStatus(user.getOrders(), OrderStatus.REFUSE)))
         .collect(Collectors.toList()));
+  }
+
+  private int countByStatus(List<Order> orders, OrderStatus status){
+    int count = 0;
+    for (Order order : orders){
+      if (order.getStatus().equals(status)){
+        count++;
+      }
+    }
+    return count;
   }
 }

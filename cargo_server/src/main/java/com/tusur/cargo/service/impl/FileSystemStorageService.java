@@ -1,7 +1,5 @@
 package com.tusur.cargo.service.impl;
 
-import com.tusur.cargo.exception.FileNotFoundException;
-import com.tusur.cargo.exception.StorageException;
 import com.tusur.cargo.properties.StorageProperties;
 import com.tusur.cargo.service.StorageService;
 import java.io.IOException;
@@ -12,8 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
-import java.util.stream.Stream;
-import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
@@ -21,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.util.FileSystemUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,16 +30,6 @@ public class FileSystemStorageService implements StorageService {
   @Autowired
   public FileSystemStorageService(StorageProperties properties) {
     this.rootLocation = Paths.get(properties.getLocation());
-  }
-
-  @Override
-  @PostConstruct
-  public void init() {
-    try {
-      Files.createDirectories(rootLocation);
-    } catch (IOException e) {
-      throw new StorageException("Could not initialize storage location", e);
-    }
   }
 
   @Override
@@ -71,18 +56,6 @@ public class FileSystemStorageService implements StorageService {
   }
 
   @Override
-  public Stream<Path> loadAll() {
-    try {
-      return Files.walk(this.rootLocation, 1)
-          .filter(path -> !path.equals(this.rootLocation))
-          .map(this.rootLocation::relativize);
-    } catch (IOException e) {
-      throw new StorageException("Failed to read stored files", e);
-    }
-
-  }
-
-  @Override
   public Path load(String filename) {
     return rootLocation.resolve(filename);
   }
@@ -100,10 +73,5 @@ public class FileSystemStorageService implements StorageService {
     } catch (MalformedURLException e) {
       return null;
     }
-  }
-
-  @Override
-  public void deleteAll() {
-    FileSystemUtils.deleteRecursively(rootLocation.toFile());
   }
 }

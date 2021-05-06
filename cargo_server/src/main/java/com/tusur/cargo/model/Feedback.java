@@ -5,6 +5,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -23,13 +24,16 @@ public class Feedback {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long feedbackId;
 
-  private Long authorId;
+  @ManyToOne
+  private User author;
   @NotBlank
   @Size(max = 50)
   private String authorName;
   private double rating;
   private String content;
-  private Long orderId;
-  private Instant created;
+
+  @ManyToOne
+  private Order order;
+  private Instant created_at;
 
 }

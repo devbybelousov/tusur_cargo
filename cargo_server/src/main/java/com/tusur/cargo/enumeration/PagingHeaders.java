@@ -1,4 +1,4 @@
-package com.tusur.cargo.dto;
+package com.tusur.cargo.enumeration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

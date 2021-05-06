@@ -1,9 +1,9 @@
 package com.tusur.cargo.controller;
 
+import com.tusur.cargo.dto.InterlocutorRequest;
 import com.tusur.cargo.dto.PasswordRequest;
-import com.tusur.cargo.dto.RecipientMessageRequest;
 import com.tusur.cargo.dto.UserResponse;
-import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.service.UserService;
 import java.util.stream.Collectors;
@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.kaczmarzyk.spring.data.jpa.domain.Equal;
 import net.kaczmarzyk.spring.data.jpa.domain.Like;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.And;
 import net.kaczmarzyk.spring.data.jpa.web.annotation.Spec;
@@ -40,33 +41,33 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping("/info")
-  public ResponseEntity<?> getUserInfo(@RequestParam Long id) throws SpringCargoException {
+  public ResponseEntity<?> getUserInfo(@RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfo(id));
   }
 
   @GetMapping("/feedback")
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<?> getUserFeedback(@RequestParam Long id) throws SpringCargoException {
+  public ResponseEntity<?> getUserFeedback(@RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsersFeedback(id));
   }
 
   @GetMapping("/recipient")
   @PreAuthorize("#id == authentication.principal.id")
-  public ResponseEntity<?> getUserRecipients(@RequestParam Long id) throws SpringCargoException {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsersByCurrentUser(id));
+  public ResponseEntity<?> getUserRecipients(@RequestParam Long id) throws NotFoundException {
+    return ResponseEntity.status(HttpStatus.OK).body(userService.getAllInterlocutorByUser(id));
   }
 
   @PostMapping("/recipient")
   @PreAuthorize("#messageRequest.userId == authentication.principal.id")
-  public ResponseEntity<?> addUserRecipient(@RequestBody RecipientMessageRequest messageRequest)
-      throws SpringCargoException {
+  public ResponseEntity<?> addUserRecipient(@RequestBody InterlocutorRequest messageRequest)
+      throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK)
-        .body(userService.createRecipientMessage(messageRequest));
+        .body(userService.addInterlocutor(messageRequest));
   }
 
   @GetMapping("/ban")
   @PreAuthorize("hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> banUser(@RequestParam Long id) throws SpringCargoException {
+  public ResponseEntity<?> banUser(@RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.banUser(id));
   }
 
@@ -75,6 +76,7 @@ public class UserController {
   public ResponseEntity<?> getAllUser(@And({
       @Spec(path = "email", params = "email", spec = Like.class),
       @Spec(path = "name", params = "name", spec = Like.class),
+      @Spec(path = "deleted", params = "deleted_at", spec = Equal.class),
       @Spec(path = "role.title", params = "role", spec = Like.class)})
       Specification<User> spec,
       Sort sort) {
@@ -93,7 +95,7 @@ public class UserController {
   @PutMapping("/password")
   @PreAuthorize("#passwordRequest.id == authentication.principal.id")
   public ResponseEntity<?> editPassword(@RequestBody @Valid PasswordRequest passwordRequest)
-      throws SpringCargoException {
+      throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userService.editPassword(passwordRequest.getOldPassword(),
             passwordRequest.getNewPassword(), passwordRequest.getId()));
@@ -102,14 +104,14 @@ public class UserController {
   @PutMapping("/email")
   @PreAuthorize("hasAuthority('USER') && #id == authentication.principal.id")
   public ResponseEntity<?> editEmail(@RequestParam @Email @NotBlank @Size(max = 50) String email,
-      @RequestParam Long id) throws SpringCargoException {
+      @RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userService.editEmail(email, id));
   }
 
   @GetMapping("/email/{email}/{token}")
   public ResponseEntity<?> verifyEmail(@PathVariable("token") String token,
-      @PathVariable("email") String email) throws SpringCargoException {
+      @PathVariable("email") String email) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userService.verifyEmail(token, email));
   }
@@ -117,14 +119,14 @@ public class UserController {
   @PutMapping("/name")
   @PreAuthorize("hasAuthority('USER') && #id == authentication.principal.id")
   public ResponseEntity<?> editName(@RequestParam @NotBlank @Size(max = 30) String name,
-      @RequestParam Long id) throws SpringCargoException {
+      @RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userService.editName(name, id));
   }
 
   @DeleteMapping
   @PreAuthorize("hasAuthority('USER') && #id == authentication.principal.id")
-  public ResponseEntity<?> deleteUser(@RequestParam Long id) throws SpringCargoException {
+  public ResponseEntity<?> deleteUser(@RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(id));
   }
 }

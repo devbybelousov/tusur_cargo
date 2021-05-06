@@ -5,19 +5,17 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
-import static org.mockito.ArgumentMatchers.any;
 
-import com.tusur.cargo.dto.RecipientMessageRequest;
-import com.tusur.cargo.enumiration.OrderStatus;
+import com.tusur.cargo.enumeration.OrderStatus;
 import com.tusur.cargo.exception.PasswordException;
 import com.tusur.cargo.model.Feedback;
+import com.tusur.cargo.model.Interlocutor;
 import com.tusur.cargo.model.Order;
-import com.tusur.cargo.model.RecipientMessage;
 import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.model.VerificationToken;
 import com.tusur.cargo.repository.OrderRepository;
-import com.tusur.cargo.repository.RecipientMessageRepository;
+import com.tusur.cargo.repository.InterlocutorRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.repository.VerificationTokenRepository;
 import com.tusur.cargo.service.UserService;
@@ -30,8 +28,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -55,7 +51,7 @@ public class UserServiceImplTest {
   private OrderRepository orderRepository;
 
   @MockBean
-  private RecipientMessageRepository messageRepository;
+  private InterlocutorRepository messageRepository;
 
   @Before
   public void setUp() {
@@ -192,26 +188,26 @@ public class UserServiceImplTest {
     Order order = new Order().toBuilder()
         .orderId(1L)
         .title("Title")
-        .status(OrderStatus.ACTIVE.toString())
+        .status(OrderStatus.ACTIVE)
         .build();
 
     List<User> users = Arrays.asList(bob, mike);
 
-    List<RecipientMessage> recipientMessageList = Arrays.asList(new RecipientMessage()
+    List<Interlocutor> interlocutors = Arrays.asList(new Interlocutor()
         .toBuilder()
         .id(1L)
         .order(order)
-        .recipient(bob)
-        .build(), new RecipientMessage()
+        .interlocutor(bob)
+        .build(), new Interlocutor()
         .toBuilder()
         .id(2L)
         .order(order)
-        .recipient(mike)
+        .interlocutor(mike)
         .build());
-    user.setRecipients(recipientMessageList);
+    user.setInterlocutors(interlocutors);
 
     Mockito.when(userRepository.findByUserId(1L)).thenReturn(java.util.Optional.of(user));
-    assertArrayEquals(userService.getAllUsersByCurrentUser(1L).toArray(), users.toArray());
+    assertArrayEquals(userService.getAllInterlocutorByUser(1L).toArray(), users.toArray());
   }
 
   @Test
@@ -222,13 +218,25 @@ public class UserServiceImplTest {
         .name("User")
         .build();
 
+    User alex = new User().toBuilder()
+        .userId(2L)
+        .email("alex@example.com")
+        .name("Alex")
+        .build();
+
+    User bob = new User().toBuilder()
+        .userId(3L)
+        .email("bob@example.com")
+        .name("Bob")
+        .build();
+
     Feedback feedback1 = new Feedback().toBuilder()
-        .authorId(2L)
+        .author(alex)
         .feedbackId(1L)
         .build();
 
     Feedback feedback2 = new Feedback().toBuilder()
-        .authorId(3L)
+        .author(bob)
         .feedbackId(2L)
         .build();
 

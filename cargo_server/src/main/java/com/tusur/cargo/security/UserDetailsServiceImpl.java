@@ -1,6 +1,6 @@
 package com.tusur.cargo.security;
 
-import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -31,7 +31,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   @Transactional(readOnly = true)
   public UserDetails loadUserById(Long id) {
     User user = userRepository.findById(id).orElseThrow(
-        () -> new SpringCargoException("User with id = " + id + " not found")
+        () -> new NotFoundException("User with id = " + id + " not found")
     );
     return UserPrincipal.create(user);
   }

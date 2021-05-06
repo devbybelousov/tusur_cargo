@@ -1,7 +1,7 @@
 package com.tusur.cargo.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.tusur.cargo.enumiration.OrderStatus;
+import com.tusur.cargo.enumeration.OrderStatus;
 import java.time.Instant;
 import java.util.List;
 import javax.persistence.Entity;
@@ -55,9 +55,11 @@ public class Order {
   @ManyToOne
   @JoinColumn(name = "userId", referencedColumnName = "userId")
   private User user;
-  private Instant created;
+  private Instant created_at;
+  private Instant deleted_at;
+
   @javax.validation.constraints.Size(max = 50)
-  private String status;
+  private OrderStatus status;
 
   public Order(String type, String title, String description, String addressSender,
       String addressRecipient, Double price, Instant departDate, Instant arrivalDate, Size size,
@@ -72,8 +74,8 @@ public class Order {
     this.arrivalDate = arrivalDate;
     this.size = size;
     this.photos = photos;
-    created = Instant.now();
-    status = OrderStatus.CHECK.toString();
+    created_at = Instant.now();
+    status = OrderStatus.CHECK;
   }
 }
 

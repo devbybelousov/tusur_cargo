@@ -18,7 +18,7 @@ public class ChatRoomServiceImpl implements ChatRoomService {
   @Override
   public Optional<String> getChatId(
       Long senderId, Long recipientId, boolean createIfNotExist) {
-    
+
     return chatRoomRepository
         .findBySenderIdAndRecipientId(senderId, recipientId)
         .map(ChatRoom::getChatId)

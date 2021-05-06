@@ -1,17 +1,15 @@
-package com.tusur.cargo.model;
+package com.tusur.cargo.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
-public class ChatNotification {
+public class ChatRequest {
 
-  private Long id;
   private Long senderId;
-  private String senderName;
+  private Long recipientId;
+  private String content;
 }

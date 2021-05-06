@@ -2,9 +2,9 @@ package com.tusur.cargo.service.impl;
 
 import com.tusur.cargo.dto.OrderPagingResponse;
 import com.tusur.cargo.dto.OrderRequest;
-import com.tusur.cargo.dto.PagingHeaders;
-import com.tusur.cargo.enumiration.OrderStatus;
-import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.enumeration.OrderStatus;
+import com.tusur.cargo.enumeration.PagingHeaders;
+import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.repository.OrderRepository;
@@ -12,6 +12,7 @@ import com.tusur.cargo.repository.PhotoRepository;
 import com.tusur.cargo.repository.SizeRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.service.OrderService;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -55,10 +56,10 @@ public class OrderServiceImpl implements OrderService {
             .map(photoRepository::findByPhotoId)
             .collect(Collectors.toList()));
 
-    order.setStatus(OrderStatus.CHECK.toString());
+    order.setStatus(OrderStatus.CHECK);
     String email = SecurityContextHolder.getContext().getAuthentication().getName();
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new SpringCargoException("User not found"));
+        .orElseThrow(() -> new NotFoundException("User not found"));
 
     order.setUser(user);
     orderRepository.save(order);
@@ -93,22 +94,17 @@ public class OrderServiceImpl implements OrderService {
 
   @Override
   @Transactional
-  public short changeStatusOrder(Long id, String status) {
+  public short changeStatusOrder(Long id, OrderStatus status) {
     Order order = orderRepository.findById(id)
-        .orElseThrow(() -> new SpringCargoException("Order not found"));
+        .orElseThrow(() -> new NotFoundException("Order not found"));
     order.setStatus(status);
 
     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
     String email = auth.getName();
     User user = userRepository.findByEmail(email)
-        .orElseThrow(() -> new SpringCargoException("User not found"));
+        .orElseThrow(() -> new NotFoundException("User not found"));
 
     user.getOrders().add(orderRepository.save(order));
-    if (status.equals(OrderStatus.ACTIVE.toString())) {
-      user.setCountAccept(user.getCountAccept() + 1);
-    } else {
-      user.setCountRefused(user.getCountRefused() + 1);
-    }
     return 1;
   }
 
@@ -128,15 +124,15 @@ public class OrderServiceImpl implements OrderService {
   @Override
   public Order getOrder(Long id) {
     return orderRepository.findById(id)
-        .orElseThrow(() -> new SpringCargoException("Order not found."));
+        .orElseThrow(() -> new NotFoundException("Order not found."));
   }
 
   @Override
   public short editOrder(OrderRequest orderRequest, Long id) {
     Order oldOrder = orderRepository.findById(id)
-        .orElseThrow(() -> new SpringCargoException("Order not found."));
+        .orElseThrow(() -> new NotFoundException("Order not found."));
 
-    oldOrder.setStatus(OrderStatus.CHECK.toString());
+    oldOrder.setStatus(OrderStatus.CHECK);
     oldOrder.setType(orderRequest.getType());
     oldOrder.setTitle(orderRequest.getTitle());
     oldOrder.setDescription(orderRequest.getDescription());
@@ -156,16 +152,19 @@ public class OrderServiceImpl implements OrderService {
   @Transactional
   public short deleteOrder(Long id) {
     Order order = orderRepository.findById(id)
-        .orElseThrow(() -> new SpringCargoException("Order not found."));
-    orderRepository.delete(order);
+        .orElseThrow(() -> new NotFoundException("Order not found."));
+
+    order.setDeleted_at(Instant.now());
+    orderRepository.save(order);
     return 1;
   }
 
   @Override
   public short completeOrder(Long id) {
     Order order = orderRepository.findById(id)
-        .orElseThrow(() -> new SpringCargoException("Order not found."));
-    order.setStatus(OrderStatus.INACTIVE.toString());
+        .orElseThrow(() -> new NotFoundException("Order not found."));
+
+    order.setStatus(OrderStatus.INACTIVE);
     orderRepository.save(order);
     return 1;
   }

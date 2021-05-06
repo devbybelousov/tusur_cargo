@@ -1,14 +1,12 @@
 package com.tusur.cargo.service;
 
-import com.tusur.cargo.dto.RecipientMessageRequest;
-import com.tusur.cargo.dto.UserResponse;
+import com.tusur.cargo.dto.InterlocutorRequest;
+import com.tusur.cargo.dto.InterlocutorResponse;
 import com.tusur.cargo.model.Feedback;
-import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.User;
 import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpHeaders;
 
 public interface UserService {
 
@@ -20,17 +18,17 @@ public interface UserService {
 
   short verifyEmail(String token, String newEmail);
 
-  short editName (String name, Long id);
+  short editName(String name, Long id);
 
-  short editPassword (String oldPassword, String newPassword, Long id);
+  short editPassword(String oldPassword, String newPassword, Long id);
 
   short deleteUser(Long id);
 
   short banUser(Long id);
 
-  List<User> getAllUsersByCurrentUser(Long id);
+  List<InterlocutorResponse> getAllInterlocutorByUser(Long id);
 
   List<Feedback> getAllUsersFeedback(Long id);
 
-  short createRecipientMessage(RecipientMessageRequest messageRequest);
+  short addInterlocutor(InterlocutorRequest messageRequest);
 }

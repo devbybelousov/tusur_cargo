@@ -1,7 +1,6 @@
 package com.tusur.cargo.service.impl;
 
 import com.tusur.cargo.model.Photo;
-import com.tusur.cargo.repository.OrderRepository;
 import com.tusur.cargo.repository.PhotoRepository;
 import com.tusur.cargo.service.ImageService;
 import java.util.Arrays;
@@ -23,7 +22,9 @@ public class ImageServiceImpl implements ImageService {
 
   @Override
   public List<Long> uploadFiles(MultipartFile[] files) {
-    if (files == null) return null;
+    if (files == null) {
+      return null;
+    }
     return Arrays.stream(files)
         .map(this::uploadImage)
         .collect(Collectors.toList());

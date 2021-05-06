@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 @EnableConfigurationProperties({StorageProperties.class, MailProperties.class})
 public class CargoApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(CargoApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(CargoApplication.class, args);
+  }
 
 }

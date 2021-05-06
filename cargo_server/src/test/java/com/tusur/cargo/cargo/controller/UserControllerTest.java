@@ -12,7 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.service.UserService;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class UserControllerTest {
   @WithMockUser("user@example.com")
   @Test
   public void findUser_login_statusNotFound() throws Exception {
-    when(userService.getUserInfo(1L)).thenThrow(new SpringCargoException(""));
+    when(userService.getUserInfo(1L)).thenThrow(new NotFoundException(""));
 
     mockMvc.perform(get(REST_URL + "/info?id=" + 1L))
         .andDo(print())

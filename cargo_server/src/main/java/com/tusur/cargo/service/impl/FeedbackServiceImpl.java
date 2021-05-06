@@ -1,10 +1,12 @@
 package com.tusur.cargo.service.impl;
 
 import com.tusur.cargo.dto.FeedbackRequest;
-import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.model.Feedback;
+import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.repository.FeedbackRepository;
+import com.tusur.cargo.repository.OrderRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.service.FeedbackService;
 import java.time.Instant;
@@ -20,22 +22,30 @@ public class FeedbackServiceImpl implements FeedbackService {
 
   private final FeedbackRepository feedbackRepository;
   private final UserRepository userRepository;
+  private final OrderRepository orderRepository;
 
   @Override
   @Transactional
   public short create(FeedbackRequest feedbackRequest) {
 
     User user = userRepository.findByUserId(feedbackRequest.getUserId())
-        .orElseThrow(() -> new SpringCargoException(
+        .orElseThrow(() -> new NotFoundException(
             "User not found with id - " + feedbackRequest.getUserId()));
 
+    User author = userRepository.findByUserId(feedbackRequest.getAuthorId())
+        .orElseThrow(() -> new NotFoundException(
+            "User not found with id - " + feedbackRequest.getAuthorId()));
+
+    Order order = orderRepository.findById(feedbackRequest.getOrderId()).orElseThrow(
+        () -> new NotFoundException("Order not found with id - " + feedbackRequest.getOrderId()));
+
     Feedback feedback = Feedback.builder()
-        .authorId(feedbackRequest.getAuthorId())
+        .author(author)
         .authorName(feedbackRequest.getAuthorName())
-        .orderId(feedbackRequest.getOrderId())
+        .order(order)
         .content(feedbackRequest.getContent())
         .rating(feedbackRequest.getRating())
-        .created(Instant.now())
+        .created_at(Instant.now())
         .build();
 
     user.getFeedbackList().add(feedbackRepository.save(feedback));
@@ -54,7 +64,7 @@ public class FeedbackServiceImpl implements FeedbackService {
   @Transactional
   public short delete(Long id) {
     Feedback feedback = feedbackRepository.findById(id)
-        .orElseThrow(() -> new SpringCargoException("Feedback not found with id - " + id));
+        .orElseThrow(() -> new NotFoundException("Feedback not found with id - " + id));
     feedbackRepository.delete(feedback);
     return 1;
   }

@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+
 public class User {
 
   @Id
@@ -55,19 +56,16 @@ public class User {
   private Boolean enabled;
 
   @JsonIgnore
+  private Instant deleted_at;
+
+  @JsonIgnore
   private Boolean isNonLocked;
   private double rating;
-
-  @JsonIgnore
-  private int countAccept;
-
-  @JsonIgnore
-  private int countRefused;
 
   @OneToMany
   @JsonIgnore
   @JoinColumn(name = "userId", referencedColumnName = "userId")
-  private List<RecipientMessage> recipients;
+  private List<Interlocutor> interlocutors;
 
   @OneToMany
   @JsonIgnore
@@ -90,7 +88,7 @@ public class User {
   }
 
   @Override
-  public String toString(){
+  public String toString() {
     return "User(" + getUserId() + getEmail() + getName() + getEnabled() + getRole() + ")";
   }
 }

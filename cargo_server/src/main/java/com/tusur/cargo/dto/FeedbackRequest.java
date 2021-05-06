@@ -1,6 +1,5 @@
 package com.tusur.cargo.dto;
 
-import java.time.Instant;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;

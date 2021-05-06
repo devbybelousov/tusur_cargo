@@ -6,6 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "mail")
 @Data
 public class MailProperties {
+
   private String host;
   private int port;
   private String protocol;

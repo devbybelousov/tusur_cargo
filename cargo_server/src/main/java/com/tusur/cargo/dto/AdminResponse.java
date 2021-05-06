@@ -8,12 +8,21 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Builder(toBuilder = true)
 public class AdminResponse {
   private Long id;
   private String name;
   private String email;
-  private int countAccepted;
-  private int countRejected;
+  private int countAccept;
+  private int countReject;
   private int countAll;
+
+  public AdminResponse(Long id, String name, String email, int countAccept, int countReject) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.countAccept = countAccept;
+    this.countReject = countReject;
+    this.countAll = countAccept + countReject;
+  }
 }

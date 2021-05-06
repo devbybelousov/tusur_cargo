@@ -2,8 +2,8 @@ package com.tusur.cargo.controller;
 
 import com.tusur.cargo.dto.LoginRequest;
 import com.tusur.cargo.dto.SignupRequest;
+import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.exception.PasswordException;
-import com.tusur.cargo.exception.SpringCargoException;
 import com.tusur.cargo.service.AuthService;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -26,14 +26,14 @@ public class AuthController {
 
   private final AuthService authService;
 
-
   @PostMapping("/sign-up")
   public ResponseEntity<?> register(@RequestBody @Valid SignupRequest signupRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(authService.registerUser(signupRequest));
   }
 
   @GetMapping("/accountVerification/{token}")
-  public ResponseEntity<?> verifyAccount(@PathVariable(name = "token") String token) throws SpringCargoException {
+  public ResponseEntity<?> verifyAccount(@PathVariable(name = "token") String token)
+      throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(authService.verifyAccount(token));
   }
 

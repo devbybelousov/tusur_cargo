@@ -23,12 +23,12 @@ public class FeedbackController {
   private final FeedbackService feedbackService;
 
   @PostMapping
-  public ResponseEntity<?> createFeedback(@RequestBody @Valid FeedbackRequest feedbackRequest){
+  public ResponseEntity<?> createFeedback(@RequestBody @Valid FeedbackRequest feedbackRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(feedbackService.create(feedbackRequest));
   }
 
   @DeleteMapping
-  public ResponseEntity<?> deleteFeedback(@RequestParam Long id){
+  public ResponseEntity<?> deleteFeedback(@RequestParam Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(feedbackService.delete(id));
   }
 

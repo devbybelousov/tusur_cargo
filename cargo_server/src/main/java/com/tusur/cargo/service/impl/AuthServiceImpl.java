@@ -4,8 +4,8 @@ import com.tusur.cargo.dto.AuthenticationResponse;
 import com.tusur.cargo.dto.LoginRequest;
 import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.dto.SignupRequest;
+import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.exception.PasswordException;
-import com.tusur.cargo.exception.SpringCargoException;
 import com.tusur.cargo.exception.UserException;
 import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
@@ -49,12 +49,12 @@ public class AuthServiceImpl implements AuthService {
     }
 
     if (!AuthService.checkPassword(signupRequest.getPassword())) {
-      throw new SpringCargoException("Password is incorrect");
+      throw new NotFoundException("Password is incorrect");
     }
 
     User user = new User();
     Role role = roleRepository.findByTitle("USER")
-        .orElseThrow(() -> new SpringCargoException("Role not found"));
+        .orElseThrow(() -> new NotFoundException("Role not found"));
 
     user.setRole(role);
     user.setEmail(signupRequest.getEmail());
@@ -92,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public short verifyAccount(String token) {
     VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-        .orElseThrow(() -> new SpringCargoException("Invalid token."));
+        .orElseThrow(() -> new NotFoundException("Invalid token."));
     return fetchUserAndEnable(verificationToken);
   }
 
@@ -103,9 +103,10 @@ public class AuthServiceImpl implements AuthService {
         new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),
             loginRequest.getPassword()));
     SecurityContextHolder.getContext().setAuthentication(authenticate);
+
     User user = userRepository.findByEmail(loginRequest.getEmail())
         .orElseThrow(
-            () -> new SpringCargoException("User not found with email-" + loginRequest.getEmail()));
+            () -> new NotFoundException("User not found with email-" + loginRequest.getEmail()));
 
     String token = jwtTokenProvider.generateToken(authenticate);
     return new AuthenticationResponse(user.getUserId(), token, user.getRole().getTitle());
@@ -116,8 +117,9 @@ public class AuthServiceImpl implements AuthService {
   public short forgotPassword(String email) {
     User user = userRepository.findByEmail(email)
         .orElseThrow(
-            () -> new SpringCargoException("User not found with email-" + email));
+            () -> new NotFoundException("User not found with email-" + email));
     String token = generateVerificationToken(user);
+
     mailService
         .sendMail(new NotificationEmail("Восстановление пароля аккаунта",
             user.getEmail(),
@@ -136,11 +138,11 @@ public class AuthServiceImpl implements AuthService {
       throw new PasswordException("Password is incorrect.");
     }
     VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
-        .orElseThrow(() -> new SpringCargoException("Invalid token."));
+        .orElseThrow(() -> new NotFoundException("Invalid token."));
     String email = verificationToken.getUser().getEmail();
     User user = userRepository.findByEmail(email)
         .orElseThrow(
-            () -> new SpringCargoException("User not found with email-" + email));
+            () -> new NotFoundException("User not found with email-" + email));
     user.setPassword(passwordEncoder.encode(password));
     userRepository.save(user);
     return 1;
@@ -152,7 +154,7 @@ public class AuthServiceImpl implements AuthService {
     String email = verificationToken.getUser().getEmail();
     User user = userRepository.findByEmail(email)
         .orElseThrow(
-            () -> new SpringCargoException("User not found with email-" + email));
+            () -> new NotFoundException("User not found with email-" + email));
     user.setEnabled(true);
     userRepository.save(user);
     return 1;

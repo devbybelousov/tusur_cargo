@@ -1,7 +1,7 @@
 package com.tusur.cargo.service.mail;
 
 import com.tusur.cargo.dto.NotificationEmail;
-import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.exception.NotFoundException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.MailException;
@@ -32,7 +32,7 @@ public class MailService {
       mailSender.send(messagePreparator);
       log.info("Activation email sent!");
     } catch (MailException e) {
-      throw new SpringCargoException(
+      throw new NotFoundException(
           "Exception occurred when sending mail to " + notificationEmail.getRecipient());
     }
   }

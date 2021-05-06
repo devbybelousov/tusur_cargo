@@ -1,4 +1,4 @@
-package com.tusur.cargo.enumiration;
+package com.tusur.cargo.enumeration;
 
 public enum OrderStatus {
   CHECK, ACTIVE, INACTIVE, REFUSE

@@ -1,7 +1,7 @@
 package com.tusur.cargo.controller;
 
+import com.tusur.cargo.dto.ChatRequest;
 import com.tusur.cargo.model.ChatMessage;
-import com.tusur.cargo.model.ChatNotification;
 import com.tusur.cargo.service.ChatMessageService;
 import com.tusur.cargo.service.ChatRoomService;
 import lombok.AllArgsConstructor;
@@ -21,26 +21,16 @@ public class ChatController {
 
   private final SimpMessagingTemplate messagingTemplate;
   private final ChatMessageService chatMessageService;
-  private final ChatRoomService chatRoomService;
+
 
   @MessageMapping("/chat")
-  public void processMessage(@Payload ChatMessage chatMessage) {
-    var chatId = chatRoomService
-        .getChatId(
-            chatMessage.getSenderId(),
-            chatMessage.getRecipientId(),
-            !chatRoomService.existChatRoom(
-                chatMessage.getSenderId(),
-                chatMessage.getRecipientId()));
-    chatMessage.setChatId(chatId.get());
+  public void processMessage(@Payload ChatRequest chatRequest) {
 
-    ChatMessage saved = chatMessageService.save(chatMessage);
+
+    ChatMessage saved = chatMessageService.save(chatRequest);
     messagingTemplate.convertAndSendToUser(
-        String.valueOf(chatMessage.getRecipientId()), "/queue/messages",
-        new ChatNotification(
-            saved.getId(),
-            saved.getSenderId(),
-            saved.getSenderName()));
+        String.valueOf(saved.getRecipient().getUserId()), "/queue/messages",
+        saved);
   }
 
   @GetMapping("/messages/{senderId}/{recipientId}/count")

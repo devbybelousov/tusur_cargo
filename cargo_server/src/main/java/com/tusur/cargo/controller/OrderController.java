@@ -2,9 +2,8 @@ package com.tusur.cargo.controller;
 
 import com.tusur.cargo.dto.OrderPagingResponse;
 import com.tusur.cargo.dto.OrderRequest;
-import com.tusur.cargo.dto.PagingHeaders;
-import com.tusur.cargo.enumiration.OrderStatus;
-import com.tusur.cargo.exception.SpringCargoException;
+import com.tusur.cargo.enumeration.OrderStatus;
+import com.tusur.cargo.enumeration.PagingHeaders;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.service.OrderService;
 import javax.validation.Valid;
@@ -53,7 +52,7 @@ public class OrderController {
       @Spec(path = "price", params = "price", spec = Equal.class),
       @Spec(path = "departDate", params = "departDate", spec = Equal.class),
       @Spec(path = "arrivalDate", params = "arrivalDate", spec = Equal.class),
-      @Spec(path = "created", params = "created", spec = Equal.class),
+      @Spec(path = "created", params = "created_at", spec = Equal.class),
       @Spec(path = "size.width", params = "width", spec = Equal.class),
       @Spec(path = "size.height", params = "height", spec = Equal.class),
       @Spec(path = "size.length", params = "length", spec = Equal.class),
@@ -97,15 +96,16 @@ public class OrderController {
 
   @GetMapping("/accept")
   @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> acceptOrder(@RequestParam Long id){
-    return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(id, OrderStatus.ACTIVE.toString()));
+  public ResponseEntity<?> acceptOrder(@RequestParam Long id) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(orderService.changeStatusOrder(id, OrderStatus.ACTIVE));
   }
 
   @GetMapping("/reject")
   @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> rejectOrder(@RequestParam Long id){
-    return ResponseEntity.status(HttpStatus.OK).body(orderService.changeStatusOrder(id, OrderStatus.REFUSE
-        .toString()));
+  public ResponseEntity<?> rejectOrder(@RequestParam Long id) {
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(orderService.changeStatusOrder(id, OrderStatus.REFUSE));
   }
 
   @GetMapping("/complete")
