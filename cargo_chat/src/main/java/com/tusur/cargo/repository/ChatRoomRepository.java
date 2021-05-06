@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
 
   Optional<ChatRoom> findBySenderIdAndRecipientId(Long senderId, Long recipientId);
+
   Boolean existsBySenderIdAndRecipientId(Long senderId, Long recipientId);
 }
