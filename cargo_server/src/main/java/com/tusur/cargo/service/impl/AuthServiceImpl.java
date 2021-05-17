@@ -4,11 +4,13 @@ import com.tusur.cargo.dto.AuthenticationResponse;
 import com.tusur.cargo.dto.LoginRequest;
 import com.tusur.cargo.dto.NotificationEmail;
 import com.tusur.cargo.dto.SignupRequest;
+import com.tusur.cargo.exception.LockedException;
 import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.exception.PasswordException;
 import com.tusur.cargo.exception.UserException;
 import com.tusur.cargo.model.Role;
 import com.tusur.cargo.model.User;
+import com.tusur.cargo.model.UserBlackList;
 import com.tusur.cargo.model.VerificationToken;
 import com.tusur.cargo.repository.RoleRepository;
 import com.tusur.cargo.repository.UserRepository;
@@ -16,7 +18,11 @@ import com.tusur.cargo.repository.VerificationTokenRepository;
 import com.tusur.cargo.security.JwtTokenProvider;
 import com.tusur.cargo.service.AuthService;
 import com.tusur.cargo.service.mail.MailService;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.Date;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -55,12 +61,11 @@ public class AuthServiceImpl implements AuthService {
     Role role = roleRepository.findByTitle("USER")
         .orElseThrow(() -> new NotFoundException("Role not found"));
 
-    user.setRole(role);
+    user.setRoles(Collections.singleton(role));
     user.setEmail(signupRequest.getEmail());
     user.setName(signupRequest.getName());
     user.setPassword(passwordEncoder.encode(signupRequest.getPassword()));
     user.setEnabled(false);
-    user.setIsNonLocked(true);
 
     String token = generateVerificationToken(userRepository.save(user));
     mailService
@@ -103,8 +108,16 @@ public class AuthServiceImpl implements AuthService {
         .orElseThrow(
             () -> new NotFoundException("User not found with email-" + loginRequest.getEmail()));
 
+    for (UserBlackList item : user.getUserBlackLists()){
+      if (item.getUnlockDate().after(new Date())){
+        throw new LockedException("Не удалось войти в систему, вы заблокированы. Причина блокировки: " + item.getMessage());
+      }
+    }
+
     String token = jwtTokenProvider.generateToken(authenticate);
-    return new AuthenticationResponse(user.getUserId(), token, user.getRole().getTitle());
+    return new AuthenticationResponse(user.getUserId(), token,
+        user.getRoles().stream().map(Role::getTitle).collect(
+            Collectors.joining()));
   }
 
   @Override
@@ -112,6 +125,13 @@ public class AuthServiceImpl implements AuthService {
     User user = userRepository.findByEmail(email)
         .orElseThrow(
             () -> new NotFoundException("User not found with email-" + email));
+
+    for (UserBlackList item : user.getUserBlackLists()){
+      if (item.getUnlockDate().after(new Date())){
+        throw new LockedException("Не удалось войти в систему, вы заблокированы. Причина блокировки: " + item.getMessage());
+      }
+    }
+
     String token = generateVerificationToken(user);
 
     mailService

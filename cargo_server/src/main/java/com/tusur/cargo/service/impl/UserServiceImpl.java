@@ -3,21 +3,25 @@ package com.tusur.cargo.service.impl;
 import com.tusur.cargo.dto.InterlocutorRequest;
 import com.tusur.cargo.dto.InterlocutorResponse;
 import com.tusur.cargo.dto.NotificationEmail;
+import com.tusur.cargo.dto.UserBlackListRequest;
 import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.exception.PasswordException;
 import com.tusur.cargo.model.Feedback;
 import com.tusur.cargo.model.Interlocutor;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.User;
+import com.tusur.cargo.model.UserBlackList;
 import com.tusur.cargo.model.VerificationToken;
 import com.tusur.cargo.repository.InterlocutorRepository;
 import com.tusur.cargo.repository.OrderRepository;
+import com.tusur.cargo.repository.UserBlackListRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.repository.VerificationTokenRepository;
 import com.tusur.cargo.service.AuthService;
 import com.tusur.cargo.service.UserService;
 import com.tusur.cargo.service.mail.MailService;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
@@ -40,8 +44,8 @@ public class UserServiceImpl implements UserService {
   private final AuthService authService;
   private final MailService mailService;
   private final VerificationTokenRepository tokenRepository;
+  private final UserBlackListRepository blackListRepository;
 
-  /* Получение информации о пользователе*/
   @Override
   public User getUserInfo(Long id) {
     return userRepository.findByUserId(id)
@@ -49,13 +53,11 @@ public class UserServiceImpl implements UserService {
             () -> new NotFoundException("User not found with id-" + id));
   }
 
-  /* Получение всех пользователей*/
   @Override
   public List<User> getAllUser(Specification<User> spec, Sort sort) {
     return userRepository.findAll(spec, sort);
   }
 
-  /* Редактирование почты*/
   @Override
   public short editEmail(String email, Long id) {
     User user = userRepository.findByUserId(id)
@@ -74,7 +76,6 @@ public class UserServiceImpl implements UserService {
     return 1;
   }
 
-  /* Подтверждение почты */
   @Override
   @Transactional
   public short verifyEmail(String token, String newEmail) {
@@ -91,7 +92,6 @@ public class UserServiceImpl implements UserService {
     return 1;
   }
 
-  /* Редактирование имени*/
   @Override
   @Transactional
   public short editName(String name, Long id) {
@@ -104,7 +104,6 @@ public class UserServiceImpl implements UserService {
     return 1;
   }
 
-  /* Редактирование пароля*/
   @Override
   @Transactional
   public short editPassword(String oldPassword, String newPassword, Long id) {
@@ -126,7 +125,6 @@ public class UserServiceImpl implements UserService {
     return 1;
   }
 
-  /* Удаление пользователя */
   @Override
   @Transactional
   public short deleteUser(Long id) {
@@ -134,25 +132,31 @@ public class UserServiceImpl implements UserService {
         .orElseThrow(
             () -> new NotFoundException("User not found with id-" + id));
 
-    user.setDeleted_at(Instant.now());
+    user.setDeletedAt(Instant.now());
     userRepository.save(user);
     return 1;
   }
 
-  /* Блокировка пользователя */
   @Override
   @Transactional
-  public short banUser(Long id) {
-    User user = userRepository.findByUserId(id)
+  public short banUser(UserBlackListRequest blackListRequest) {
+    User user = userRepository.findByUserId(blackListRequest.getId())
         .orElseThrow(
-            () -> new NotFoundException("User not found with id-" + id));
+            () -> new NotFoundException("User not found with id-" + blackListRequest.getId()));
 
-    user.setIsNonLocked(false);
+    UserBlackList userBlackList  = new UserBlackList()
+        .toBuilder()
+        .dateOfBlocking(new Date())
+        .message(blackListRequest.getMessage())
+        .unlockDate(blackListRequest.getUnlockDate())
+        .build();
+
+    user.getUserBlackLists().add(blackListRepository.save(userBlackList));
+
     userRepository.save(user);
     return 1;
   }
 
-  /* Получение всех собеседников */
   @Override
   public List<InterlocutorResponse> getAllInterlocutorByUser(Long id) {
     User user = userRepository.findByUserId(id)
@@ -163,13 +167,12 @@ public class UserServiceImpl implements UserService {
         .toBuilder()
         .userId(item.getInterlocutor().getUserId())
         .name(item.getInterlocutor().getName())
-        .role(item.getInterlocutor().getRole())
+        .role(item.getInterlocutor().getRoles())
         .order(item.getOrder())
         .build())
         .collect(Collectors.toList());
   }
 
-  /* Получение всех отзывов */
   @Override
   public List<Feedback> getAllUsersFeedback(Long id) {
     User user = userRepository.findByUserId(id)
@@ -178,7 +181,6 @@ public class UserServiceImpl implements UserService {
     return user.getFeedbackList();
   }
 
-  /* Добавления собеседника */
   @Override
   public short addInterlocutor(InterlocutorRequest interlocutorRequest) {
     User user = userRepository.findByUserId(interlocutorRequest.getUserId())

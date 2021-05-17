@@ -3,14 +3,16 @@ package com.tusur.cargo.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tusur.cargo.enumeration.OrderStatus;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
@@ -46,12 +48,15 @@ public class Order {
 
   private Double price;
 
-  private Instant departDate;
+  private Date departDate;
 
-  private Instant arrivalDate;
+  private Date arrivalDate;
 
-  @OneToMany
-  @JoinColumn(name = "orderId", referencedColumnName = "orderId")
+  @ManyToMany
+  @JoinTable(name = "order_photo",
+      joinColumns = @JoinColumn(name = "orderId"),
+      inverseJoinColumns = @JoinColumn(name = "photoId")
+  )
   private List<Photo> photos;
 
   @OneToOne
@@ -62,15 +67,16 @@ public class Order {
   @JoinColumn(name = "userId", referencedColumnName = "userId")
   private User user;
 
-  private Instant created_at;
+  private Date createdAt;
 
-  private Instant deleted_at;
+  private Date deletedAt;
 
   @Size(max = 50)
   private OrderStatus status;
 
   public Order(String type, String title, String description, String addressSender,
-      String addressRecipient, Double price, Instant departDate, Instant arrivalDate, OrderSize orderSize,
+      String addressRecipient, Double price, Date departDate, Date arrivalDate,
+      OrderSize orderSize,
       List<Photo> photos) {
     this.type = type;
     this.title = title;
@@ -82,7 +88,7 @@ public class Order {
     this.arrivalDate = arrivalDate;
     this.orderSize = orderSize;
     this.photos = photos;
-    created_at = Instant.now();
+    createdAt = new Date();
     status = OrderStatus.CHECK;
   }
 }

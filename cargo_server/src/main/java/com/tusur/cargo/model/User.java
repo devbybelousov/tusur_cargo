@@ -1,18 +1,16 @@
 package com.tusur.cargo.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.Instant;
 import java.util.List;
-import javax.persistence.CascadeType;
+import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -42,33 +40,52 @@ public class User {
   @NotBlank(message = "Name is required")
   private String name;
 
-  @JsonFormat(shape = Shape.STRING)
-  @OneToOne(cascade = CascadeType.MERGE)
-  private Role role;
+  @ManyToMany
+  @JoinTable(name = "user_role",
+      joinColumns = @JoinColumn(name = "userId"),
+      inverseJoinColumns = @JoinColumn(name = "roleId")
+  )
+  private Set<Role> roles;
 
   @JsonIgnore
-  @OneToMany
-  @JoinColumn(name = "userId", referencedColumnName = "userId")
+  @ManyToMany
+  @JoinTable(name = "user_order",
+      joinColumns = @JoinColumn(name = "userId"),
+      inverseJoinColumns = @JoinColumn(name = "orderId")
+  )
   private List<Order> orders;
 
   @JsonIgnore
   private Boolean enabled;
 
   @JsonIgnore
-  private Instant deleted_at;
+  private Instant deletedAt;
 
-  @JsonIgnore
-  private Boolean isNonLocked;
   private double rating;
 
-  @OneToMany
+
   @JsonIgnore
-  @JoinColumn(name = "userId", referencedColumnName = "userId")
+  @ManyToMany
+  @JoinTable(name = "user_interlocutor",
+      joinColumns = @JoinColumn(name = "userId"),
+      inverseJoinColumns = @JoinColumn(name = "interlocutorId")
+  )
   private List<Interlocutor> interlocutors;
 
-  @OneToMany
   @JsonIgnore
-  @JoinColumn(name = "userId", referencedColumnName = "userId")
+  @ManyToMany
+  @JoinTable(name = "user_black_list",
+      joinColumns = @JoinColumn(name = "userId"),
+      inverseJoinColumns = @JoinColumn(name = "blackListId")
+  )
+  private List<UserBlackList> userBlackLists;
+
+  @JsonIgnore
+  @ManyToMany
+  @JoinTable(name = "user_feedback",
+      joinColumns = @JoinColumn(name = "userId"),
+      inverseJoinColumns = @JoinColumn(name = "feedbackId")
+  )
   private List<Feedback> feedbackList;
 
   public User(String email, String password, String name, boolean enabled) {
@@ -88,6 +105,6 @@ public class User {
 
   @Override
   public String toString() {
-    return "User(" + getUserId() + getEmail() + getName() + getEnabled() + getRole() + ")";
+    return "User(" + getUserId() + getEmail() + getName() + getEnabled() + getRoles() + ")";
   }
 }

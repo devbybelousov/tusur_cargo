@@ -15,6 +15,8 @@ import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.repository.VerificationTokenRepository;
 import com.tusur.cargo.security.JwtTokenProvider;
 import com.tusur.cargo.service.AuthService;
+import java.util.Collection;
+import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -60,8 +62,7 @@ public class AuthServiceImplTest {
         .password(passwordEncoder.encode("password"))
         .name("User")
         .enabled(true)
-        .isNonLocked(true)
-        .role(new Role(1L, "USER"))
+        .roles(Collections.singleton(new Role(1L, "USER")))
         .build();
 
     Mockito.when(userRepository.findByEmail(user.getEmail()))
@@ -98,8 +99,7 @@ public class AuthServiceImplTest {
         .password(passwordEncoder.encode("password"))
         .name("User")
         .enabled(true)
-        .isNonLocked(true)
-        .role(new Role(1L, "USER"))
+        .roles(Collections.singleton(new Role(1L, "USER")))
         .build();
 
     Mockito.when(tokenRepository.findByToken(token))
@@ -131,8 +131,7 @@ public class AuthServiceImplTest {
         .password(passwordEncoder.encode("passwordPas1234567890-!@#$%^&*()_+=-<>"))
         .name("User")
         .enabled(true)
-        .isNonLocked(true)
-        .role(new Role(1L, "USER"))
+        .roles(Collections.singleton(new Role(1L, "USER")))
         .build();
 
     Mockito.when(tokenRepository.findByToken(token))

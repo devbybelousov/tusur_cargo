@@ -1,12 +1,12 @@
 package com.tusur.cargo.controller.advice;
 
+import com.tusur.cargo.exception.LockedException;
 import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.exception.PasswordException;
 import com.tusur.cargo.exception.UserException;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -34,5 +34,12 @@ public class RestErrorHandler {
   public void handleBadRequestException(UserException ex) {
     log.debug("handling 400 error");
     log.debug(ex.getMessage());
+  }
+
+  @ExceptionHandler(LockedException.class)
+  public ResponseEntity<String> handleBadRequestException(LockedException ex) {
+    log.debug("handling 423 error");
+    log.debug(ex.getMessage());
+    return ResponseEntity.status(HttpStatus.LOCKED).body(ex.getLocalizedMessage());
   }
 }

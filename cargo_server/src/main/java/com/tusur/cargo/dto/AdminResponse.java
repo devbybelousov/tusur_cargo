@@ -10,11 +10,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 public class AdminResponse {
+
   private Long id;
+
   private String name;
+
   private String email;
+
   private int countAccept;
+
   private int countReject;
+
   private int countAll;
 
   public AdminResponse(Long id, String name, String email, int countAccept, int countReject) {

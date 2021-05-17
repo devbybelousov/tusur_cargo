@@ -11,6 +11,7 @@ import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.service.AdminService;
 import com.tusur.cargo.service.AuthService;
 import com.tusur.cargo.service.mail.MailService;
+import java.util.Collections;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -28,7 +29,6 @@ public class AdminServiceImpl implements AdminService {
   private final PasswordEncoder passwordEncoder;
   private final RoleRepository roleRepository;
 
-  /* Создание администратора*/
   @Override
   @Transactional
   public short createAdmin(AdminRequest adminRequest) {
@@ -38,11 +38,12 @@ public class AdminServiceImpl implements AdminService {
     User user = new User(adminRequest.getEmail(),
         passwordEncoder.encode(adminRequest.getPassword()),
         "Администратор №" + (userRepository.countByNameLike("Администратор №") + 1), true);
-    user.setIsNonLocked(true);
     Role role = roleRepository.findByTitle("ADMIN")
         .orElseThrow(() -> new NotFoundException("Role not found"));
-    user.setRole(role);
+
+    user.setRoles(Collections.singleton(role));
     userRepository.save(user);
+
     String token = authService.generateVerificationToken(user);
     mailService
         .sendMail(new NotificationEmail("Пожалуйста, подтвердите свой аккаунт",

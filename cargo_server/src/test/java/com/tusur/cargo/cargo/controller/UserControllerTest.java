@@ -12,10 +12,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.tusur.cargo.dto.UserBlackListRequest;
 import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.service.UserService;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +107,8 @@ public class UserControllerTest {
   @WithMockUser(value = "admin@example.com", authorities = {"SUPER_ADMIN"})
   @Test
   public void banUser_authenticated_ifAdmin_statusOk() throws Exception {
-    when(userService.banUser(1L)).thenReturn((short) 1);
+    UserBlackListRequest userBlackListRequest = new UserBlackListRequest(1L, "message", new Date());
+    when(userService.banUser(userBlackListRequest)).thenReturn((short) 1);
 
     mockMvc.perform(get(REST_URL + "/ban?id=" + 1L))
         .andDo(print())

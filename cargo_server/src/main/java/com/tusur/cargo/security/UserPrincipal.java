@@ -4,6 +4,7 @@ import com.tusur.cargo.model.User;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,7 +20,6 @@ public class UserPrincipal implements UserDetails {
   private String email;
   private String password;
   private boolean enabled;
-  private boolean isNonLocked;
   private Collection<? extends GrantedAuthority> authorities;
 
   public UserPrincipal(
@@ -28,7 +28,6 @@ public class UserPrincipal implements UserDetails {
       String email,
       String password,
       boolean enabled,
-      boolean isNonLocked,
       Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.name = name;
@@ -36,20 +35,19 @@ public class UserPrincipal implements UserDetails {
     this.password = password;
     this.authorities = authorities;
     this.enabled = enabled;
-    this.isNonLocked = isNonLocked;
   }
 
   public static UserPrincipal create(User user) {
-    List<GrantedAuthority> authorityList = Collections
-        .singletonList(new SimpleGrantedAuthority(user.getRole().getTitle()));
+    List<GrantedAuthority> authorities = user.getRoles().stream().map(role ->
+        new SimpleGrantedAuthority(role.getTitle())
+    ).collect(Collectors.toList());
     return new UserPrincipal(
         user.getUserId(),
         user.getName(),
         user.getEmail(),
         user.getPassword(),
         user.getEnabled(),
-        user.getIsNonLocked(),
-        authorityList
+        authorities
     );
   }
 
@@ -75,7 +73,7 @@ public class UserPrincipal implements UserDetails {
 
   @Override
   public boolean isAccountNonLocked() {
-    return isNonLocked;
+    return true;
   }
 
   @Override

@@ -13,6 +13,7 @@ import com.tusur.cargo.repository.SizeRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.service.OrderService;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -154,7 +155,7 @@ public class OrderServiceImpl implements OrderService {
     Order order = orderRepository.findById(id)
         .orElseThrow(() -> new NotFoundException("Order not found."));
 
-    order.setDeleted_at(Instant.now());
+    order.setDeletedAt(new Date());
     orderRepository.save(order);
     return 1;
   }

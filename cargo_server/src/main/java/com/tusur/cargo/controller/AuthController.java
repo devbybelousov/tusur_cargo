@@ -60,7 +60,8 @@ public class AuthController {
   @ApiOperation(value = "Авторизация пользователя")
   @ApiResponses(value = {
       @ApiResponse(code = 200, message = "OK"),
-      @ApiResponse(code = 401, message = "Неверный логин или пароль")
+      @ApiResponse(code = 401, message = "Неверный логин или пароль"),
+      @ApiResponse(code = 423, message = "Пользователь заблокирован")
   })
   public ResponseEntity<?> loginUser(
       @ApiParam("Информация об авторизации") @RequestBody @Valid LoginRequest loginRequest) {

@@ -2,8 +2,10 @@ package com.tusur.cargo.service;
 
 import com.tusur.cargo.dto.InterlocutorRequest;
 import com.tusur.cargo.dto.InterlocutorResponse;
+import com.tusur.cargo.dto.UserBlackListRequest;
 import com.tusur.cargo.model.Feedback;
 import com.tusur.cargo.model.User;
+import com.tusur.cargo.model.UserBlackList;
 import java.util.List;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -24,7 +26,7 @@ public interface UserService {
 
   short deleteUser(Long id);
 
-  short banUser(Long id);
+  short banUser(UserBlackListRequest blackListRequest);
 
   List<InterlocutorResponse> getAllInterlocutorByUser(Long id);
 

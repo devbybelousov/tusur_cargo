@@ -6,6 +6,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import com.tusur.cargo.dto.UserBlackListRequest;
 import com.tusur.cargo.enumeration.OrderStatus;
 import com.tusur.cargo.exception.PasswordException;
 import com.tusur.cargo.model.Feedback;
@@ -19,7 +20,10 @@ import com.tusur.cargo.repository.InterlocutorRepository;
 import com.tusur.cargo.repository.UserRepository;
 import com.tusur.cargo.repository.VerificationTokenRepository;
 import com.tusur.cargo.service.UserService;
+import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
@@ -61,8 +65,7 @@ public class UserServiceImplTest {
         .password(passwordEncoder.encode("password"))
         .name("Alex")
         .enabled(true)
-        .isNonLocked(true)
-        .role(new Role(1L, "USER"))
+        .roles(Collections.singleton(new Role(1L, "USER")))
         .build();
 
     Mockito.when(userRepository.findByEmail(alex.getEmail()))
@@ -130,7 +133,8 @@ public class UserServiceImplTest {
 
   @Test
   public void whenBanUser_thenReturnOne() {
-    assertEquals(userService.banUser(1L), 1);
+    UserBlackListRequest userBlackListRequest = new UserBlackListRequest(1L, "message", new Date());
+    assertEquals(userService.banUser(userBlackListRequest), 1);
   }
 
   @Test
@@ -151,8 +155,7 @@ public class UserServiceImplTest {
         .password(passwordEncoder.encode("password"))
         .name("Alex")
         .enabled(true)
-        .isNonLocked(true)
-        .role(new Role(1L, "USER"))
+        .roles(Collections.singleton(new Role(1L, "USER")))
         .build();
 
     Mockito.when(tokenRepository.findByToken("token"))
@@ -195,12 +198,12 @@ public class UserServiceImplTest {
 
     List<Interlocutor> interlocutors = Arrays.asList(new Interlocutor()
         .toBuilder()
-        .id(1L)
+        .interlocutorId(1L)
         .order(order)
         .interlocutor(bob)
         .build(), new Interlocutor()
         .toBuilder()
-        .id(2L)
+        .interlocutorId(2L)
         .order(order)
         .interlocutor(mike)
         .build());

@@ -1,10 +1,12 @@
 package com.tusur.cargo.model;
 
+import java.time.Instant;
+import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,20 +17,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Builder(toBuilder = true)
-public class Interlocutor {
+@Table(name = "blackList")
+public class UserBlackList {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long interlocutorId;
+  private Long blackListId;
 
-  @OneToOne
-  private User interlocutor;
+  private String message;
 
-  @OneToOne
-  private Order order;
+  private Date dateOfBlocking;
 
-  public Interlocutor(User interlocutor, Order order) {
-    this.interlocutor = interlocutor;
-    this.order = order;
-  }
+  private Date unlockDate;
 }

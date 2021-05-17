@@ -2,6 +2,7 @@ package com.tusur.cargo.controller;
 
 import com.tusur.cargo.dto.InterlocutorRequest;
 import com.tusur.cargo.dto.PasswordRequest;
+import com.tusur.cargo.dto.UserBlackListRequest;
 import com.tusur.cargo.dto.UserResponse;
 import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.model.User;
@@ -106,11 +107,11 @@ public class UserController {
       @ApiResponse(code = 403, message = "Доступ запрещен"),
       @ApiResponse(code = 404, message = "Пользователь не найден")
   })
-  @GetMapping("/ban")
+  @PostMapping("/ban")
   @PreAuthorize("hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> banUser(@ApiParam("Идентификатор пользователя") @RequestParam Long id)
+  public ResponseEntity<?> banUser(@Valid @RequestBody UserBlackListRequest userBlackListRequest)
       throws NotFoundException {
-    return ResponseEntity.status(HttpStatus.OK).body(userService.banUser(id));
+    return ResponseEntity.status(HttpStatus.OK).body(userService.banUser(userBlackListRequest));
   }
 
   @ApiOperation(value = "Получить всех пользователей")

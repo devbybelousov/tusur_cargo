@@ -1,8 +1,11 @@
 package com.tusur.cargo.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 import com.tusur.cargo.model.OrderSize;
 import io.swagger.annotations.ApiModelProperty;
 import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -50,12 +53,14 @@ public class OrderRequest {
   private Double price;
 
   @ApiModelProperty(notes = "Дата отправления",
-      example = "20.05.2021", required = false)
-  private Instant departDate;
+      example = "2021-05-22", required = false)
+  @JsonFormat(pattern = "yyyy-mm-dd", timezone = "UTC")
+  private Date departDate;
 
   @ApiModelProperty(notes = "Дата получения",
-      example = "20.05.2021", required = false)
-  private Instant arrivalDate;
+      example = "2021-05-22", required = false)
+  @JsonFormat(pattern = "yyyy-mm-dd", timezone = "UTC")
+  private Date arrivalDate;
 
   @Valid
   @ApiModelProperty(notes = "Размер", required = false)
