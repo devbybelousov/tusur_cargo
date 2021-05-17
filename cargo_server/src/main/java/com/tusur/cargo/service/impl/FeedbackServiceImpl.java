@@ -41,7 +41,6 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     Feedback feedback = Feedback.builder()
         .author(author)
-        .authorName(feedbackRequest.getAuthorName())
         .order(order)
         .content(feedbackRequest.getContent())
         .rating(feedbackRequest.getRating())

@@ -24,6 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 @Configuration
 @EnableWebSecurity
@@ -53,8 +54,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         .and()
         .authorizeRequests()
-        .antMatchers("/api/auth/*", "/api/auth/accountVerification/*").permitAll()
-        .antMatchers("/api/order", "/api/order/info", "/api/image/*").permitAll()
+        .antMatchers("/auth/*", "/auth/accountVerification/*").permitAll()
+        .antMatchers("/order", "/order/info", "/image/*").permitAll()
+        .antMatchers("/v2/api-docs", "/configuration/**", "/swagger*/**", "/webjars/**")
+        .permitAll()
         .anyRequest().authenticated();
     http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
   }

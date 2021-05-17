@@ -40,7 +40,6 @@ public class AuthServiceImpl implements AuthService {
   private final JwtTokenProvider jwtTokenProvider;
   private final RoleRepository roleRepository;
 
-  /* Регистрация пользователя */
   @Transactional
   @Override
   public short registerUser(SignupRequest signupRequest) {
@@ -74,8 +73,6 @@ public class AuthServiceImpl implements AuthService {
     return 1;
   }
 
-
-  /* Генерация токена подтверждения*/
   @Transactional
   @Override
   public String generateVerificationToken(User user) {
@@ -88,7 +85,6 @@ public class AuthServiceImpl implements AuthService {
     return token;
   }
 
-  /*Верификация аккаунта*/
   @Override
   public short verifyAccount(String token) {
     VerificationToken verificationToken = verificationTokenRepository.findByToken(token)
@@ -96,7 +92,6 @@ public class AuthServiceImpl implements AuthService {
     return fetchUserAndEnable(verificationToken);
   }
 
-  /* Авторизация */
   @Override
   public AuthenticationResponse login(LoginRequest loginRequest) {
     Authentication authenticate = authenticationManager.authenticate(
@@ -112,7 +107,6 @@ public class AuthServiceImpl implements AuthService {
     return new AuthenticationResponse(user.getUserId(), token, user.getRole().getTitle());
   }
 
-  /* Восстановление пароля*/
   @Override
   public short forgotPassword(String email) {
     User user = userRepository.findByEmail(email)
@@ -130,7 +124,6 @@ public class AuthServiceImpl implements AuthService {
     return 1;
   }
 
-  /* Подтверждение смены пароля*/
   @Override
   @Transactional
   public short changePassword(String password, String token) throws PasswordException {

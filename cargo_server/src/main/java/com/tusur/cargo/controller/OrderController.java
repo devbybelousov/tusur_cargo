@@ -6,6 +6,11 @@ import com.tusur.cargo.enumeration.OrderStatus;
 import com.tusur.cargo.enumeration.PagingHeaders;
 import com.tusur.cargo.model.Order;
 import com.tusur.cargo.service.OrderService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import javax.validation.Valid;
 import lombok.AllArgsConstructor;
 import net.kaczmarzyk.spring.data.jpa.domain.Equal;
@@ -30,12 +35,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/order")
+@RequestMapping("/order")
 @AllArgsConstructor
+@Api(value = "order", description = "API для операций с объявлениями", tags = "Order API")
 public class OrderController {
 
   private final OrderService orderService;
 
+  @ApiOperation(value = "Создать объявление")
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @PostMapping
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<?> createOrder(@RequestBody @Valid OrderRequest orderRequest) {
@@ -43,6 +56,11 @@ public class OrderController {
         .body(orderService.createOrder(orderRequest));
   }
 
+  @ApiOperation(value = "Получить все объявления")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный")
+  })
   @GetMapping
   public ResponseEntity<?> getAllOrder(@And({
       @Spec(path = "title", params = "title", spec = Like.class),
@@ -76,17 +94,37 @@ public class OrderController {
     return headers;
   }
 
+  @ApiOperation(value = "Получить информацию об объявлении")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 404, message = "Объявление не найдено"),
+  })
   @GetMapping("/info")
-  public ResponseEntity<?> getOrderById(@RequestParam("id") Long id) {
+  public ResponseEntity<?> getOrderById(@ApiParam("Идентификатор объявления")  @RequestParam("id") Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.getOrder(id));
   }
 
+  @ApiOperation(value = "Удалить объявление")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Объявление не найдено"),
+  })
   @DeleteMapping
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<?> deleteOrder(@RequestParam("id") Long id) {
+  public ResponseEntity<?> deleteOrder(@ApiParam("Идентификатор объявления")  @RequestParam("id") Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.deleteOrder(id));
   }
 
+  @ApiOperation(value = "Редактировать объявление")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Объявление не найдено"),
+  })
   @PutMapping
   @PreAuthorize("hasAuthority('USER')")
   public ResponseEntity<?> updateOrder(@RequestBody @Valid OrderRequest orderRequest,
@@ -94,23 +132,44 @@ public class OrderController {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.editOrder(orderRequest, id));
   }
 
+  @ApiOperation(value = "Принять объявление")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Объявление не найдено"),
+  })
   @GetMapping("/accept")
   @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> acceptOrder(@RequestParam Long id) {
+  public ResponseEntity<?> acceptOrder(@ApiParam("Идентификатор объявления")  @RequestParam Long id) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(orderService.changeStatusOrder(id, OrderStatus.ACTIVE));
   }
 
+  @ApiOperation(value = "Отменить объявление")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Объявление не найдено"),
+  })
   @GetMapping("/reject")
   @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> rejectOrder(@RequestParam Long id) {
+  public ResponseEntity<?> rejectOrder(@ApiParam("Идентификатор объявления")  @RequestParam Long id) {
     return ResponseEntity.status(HttpStatus.OK)
         .body(orderService.changeStatusOrder(id, OrderStatus.REFUSE));
   }
 
+  @ApiOperation(value = "Завершить объявление")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Объявление не найдено"),
+  })
   @GetMapping("/complete")
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<?> completeStatus(@RequestParam("id") Long id) {
+  public ResponseEntity<?> completeStatus(@ApiParam("Идентификатор объявления") @RequestParam("id") Long id) {
     return ResponseEntity.status(HttpStatus.OK).body(orderService.completeOrder(id));
   }
 

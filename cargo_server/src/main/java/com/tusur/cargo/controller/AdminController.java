@@ -7,6 +7,11 @@ import com.tusur.cargo.model.Order;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.service.AdminService;
 import com.tusur.cargo.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -26,9 +31,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
 @AllArgsConstructor
+@Api(value = "admin", description = "API для операций администратора", tags = "Admin API")
 public class AdminController {
 
   private final AdminService adminService;
@@ -36,11 +42,25 @@ public class AdminController {
 
   @PostMapping
   @PreAuthorize("hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> createAdmin(@RequestBody @Valid AdminRequest adminRequest) {
+  @ApiOperation(value = "Добавить администратора")
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message = "Создан"),
+      @ApiResponse(code = 400, message = "Данный email уже занят"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 404, message = "Роли 'ADMIN' нет в базе"),
+      @ApiResponse(code = 403, message = "Доступ запрещен")
+  })
+  public ResponseEntity<?> createAdmin(@ApiParam("Информация об администраторе") @RequestBody @Valid AdminRequest adminRequest) {
     return ResponseEntity.status(HttpStatus.CREATED).body(adminService.createAdmin(adminRequest));
   }
 
   @GetMapping
+  @ApiOperation(value = "Получить всех администраторов")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен")
+  })
   @PreAuthorize("hasAuthority('SUPER_ADMIN')")
   public ResponseEntity<?> getAllAdmin(@And({
       @Spec(path = "email", params = "email", spec = Like.class),

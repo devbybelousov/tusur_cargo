@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,10 +39,15 @@ public class Order {
   private String title;
 
   private String description;
+
   private String addressSender;
+
   private String addressRecipient;
+
   private Double price;
+
   private Instant departDate;
+
   private Instant arrivalDate;
 
   @OneToMany
@@ -49,20 +55,22 @@ public class Order {
   private List<Photo> photos;
 
   @OneToOne
-  private Size size;
+  private OrderSize orderSize;
 
   @JsonIgnore
   @ManyToOne
   @JoinColumn(name = "userId", referencedColumnName = "userId")
   private User user;
+
   private Instant created_at;
+
   private Instant deleted_at;
 
-  @javax.validation.constraints.Size(max = 50)
+  @Size(max = 50)
   private OrderStatus status;
 
   public Order(String type, String title, String description, String addressSender,
-      String addressRecipient, Double price, Instant departDate, Instant arrivalDate, Size size,
+      String addressRecipient, Double price, Instant departDate, Instant arrivalDate, OrderSize orderSize,
       List<Photo> photos) {
     this.type = type;
     this.title = title;
@@ -72,7 +80,7 @@ public class Order {
     this.price = price;
     this.departDate = departDate;
     this.arrivalDate = arrivalDate;
-    this.size = size;
+    this.orderSize = orderSize;
     this.photos = photos;
     created_at = Instant.now();
     status = OrderStatus.CHECK;

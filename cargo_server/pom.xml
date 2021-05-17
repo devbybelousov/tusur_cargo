@@ -11,6 +11,7 @@
 	<properties>
 		<downloadSources>true</downloadSources>
 		<downloadJavadocs>true</downloadJavadocs>
+		<swagger.version>2.9.2</swagger.version>
 	</properties>
 
 	<artifactId>cargo_server</artifactId>
@@ -91,5 +92,15 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>${swagger.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>${swagger.version}</version>
+		</dependency>
+  </dependencies>
 </project>

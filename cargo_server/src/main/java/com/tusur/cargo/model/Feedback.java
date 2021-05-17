@@ -26,14 +26,14 @@ public class Feedback {
 
   @ManyToOne
   private User author;
-  @NotBlank
-  @Size(max = 50)
-  private String authorName;
+
   private double rating;
+
   private String content;
 
   @ManyToOne
   private Order order;
+
   private Instant created_at;
 
 }

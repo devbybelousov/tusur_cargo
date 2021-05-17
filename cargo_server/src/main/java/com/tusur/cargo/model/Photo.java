@@ -22,7 +22,7 @@ public class Photo {
   @NotBlank
   private String link;
 
-  public Photo(@NotBlank String link) {
+  public Photo(String link) {
     this.link = link;
   }
 }

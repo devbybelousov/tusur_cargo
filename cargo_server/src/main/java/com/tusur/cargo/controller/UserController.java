@@ -6,6 +6,11 @@ import com.tusur.cargo.dto.UserResponse;
 import com.tusur.cargo.exception.NotFoundException;
 import com.tusur.cargo.model.User;
 import com.tusur.cargo.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -33,30 +38,59 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/user")
 @AllArgsConstructor
 @Slf4j
+@Api(value = "user", description = "API для операций с пользователями", tags = "User API")
 public class UserController {
 
   private final UserService userService;
 
+  @ApiOperation(value = "Получить информацию о пользователе")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @GetMapping("/info")
-  public ResponseEntity<?> getUserInfo(@RequestParam Long id) throws NotFoundException {
+  public ResponseEntity<?> getUserInfo(
+      @ApiParam("Идентификатор пользователя") @RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getUserInfo(id));
   }
 
+  @ApiOperation(value = "Получить отзывы о пользователе")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @GetMapping("/feedback")
   @PreAuthorize("hasAuthority('USER')")
-  public ResponseEntity<?> getUserFeedback(@RequestParam Long id) throws NotFoundException {
+  public ResponseEntity<?> getUserFeedback(
+      @ApiParam("Идентификатор пользователя") @RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsersFeedback(id));
   }
 
+  @ApiOperation(value = "Получить собеседников текущего пользователя")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @GetMapping("/recipient")
   @PreAuthorize("#id == authentication.principal.id")
-  public ResponseEntity<?> getUserRecipients(@RequestParam Long id) throws NotFoundException {
+  public ResponseEntity<?> getUserRecipients(
+      @ApiParam("Идентификатор пользователя") @RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.getAllInterlocutorByUser(id));
   }
 
+  @ApiOperation(value = "Добавить собеседника текущему пользователю")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @PostMapping("/recipient")
   @PreAuthorize("#messageRequest.userId == authentication.principal.id")
   public ResponseEntity<?> addUserRecipient(@RequestBody InterlocutorRequest messageRequest)
@@ -65,12 +99,27 @@ public class UserController {
         .body(userService.addInterlocutor(messageRequest));
   }
 
+  @ApiOperation(value = "Заблокировать пользователя")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @GetMapping("/ban")
   @PreAuthorize("hasAuthority('SUPER_ADMIN')")
-  public ResponseEntity<?> banUser(@RequestParam Long id) throws NotFoundException {
+  public ResponseEntity<?> banUser(@ApiParam("Идентификатор пользователя") @RequestParam Long id)
+      throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.banUser(id));
   }
 
+  @ApiOperation(value = "Получить всех пользователей")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @GetMapping
   @PreAuthorize("hasAuthority('ADMIN') || hasAuthority('SUPER_ADMIN')")
   public ResponseEntity<?> getAllUser(@And({
@@ -92,6 +141,13 @@ public class UserController {
             .collect(Collectors.toList()));
   }
 
+  @ApiOperation(value = "Изменить пароль текущего пользователя")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 400, message = "Неверный пароль"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @PutMapping("/password")
   @PreAuthorize("#passwordRequest.id == authentication.principal.id")
   public ResponseEntity<?> editPassword(@RequestBody @Valid PasswordRequest passwordRequest)
@@ -101,32 +157,64 @@ public class UserController {
             passwordRequest.getNewPassword(), passwordRequest.getId()));
   }
 
+  @ApiOperation(value = "Изменить почту текущего пользователя")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @PutMapping("/email")
   @PreAuthorize("hasAuthority('USER') && #id == authentication.principal.id")
-  public ResponseEntity<?> editEmail(@RequestParam @Email @NotBlank @Size(max = 50) String email,
-      @RequestParam Long id) throws NotFoundException {
+  public ResponseEntity<?> editEmail(
+      @ApiParam("Почта пользователя") @RequestParam @Email @NotBlank @Size(max = 50) String email,
+      @ApiParam("Идентификатор пользователя") @RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userService.editEmail(email, id));
   }
 
+  @ApiOperation(value = "Подтвердить смену почты пользователя")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 404, message = "Пользователь не найден или не верный токен")
+  })
   @GetMapping("/email/{email}/{token}")
-  public ResponseEntity<?> verifyEmail(@PathVariable("token") String token,
-      @PathVariable("email") String email) throws NotFoundException {
+  public ResponseEntity<?> verifyEmail(
+      @ApiParam("Токен для подтверждения почты") @PathVariable("token") String token,
+      @ApiParam("Почта пользователя") @PathVariable("email") String email)
+      throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userService.verifyEmail(token, email));
   }
 
+  @ApiOperation(value = "Изменить имя пользователя")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @PutMapping("/name")
   @PreAuthorize("hasAuthority('USER') && #id == authentication.principal.id")
-  public ResponseEntity<?> editName(@RequestParam @NotBlank @Size(max = 30) String name,
-      @RequestParam Long id) throws NotFoundException {
+  public ResponseEntity<?> editName(
+      @ApiParam("Имя пользователя") @RequestParam @NotBlank @Size(max = 30) String name,
+      @ApiParam("Идентификатор пользователя") @RequestParam Long id) throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK)
         .body(userService.editName(name, id));
   }
 
+  @ApiOperation(value = "Удалить текущего пользователя")
+  @ApiResponses(value = {
+      @ApiResponse(code = 200, message = "OK"),
+      @ApiResponse(code = 401, message = "Не авторизированный"),
+      @ApiResponse(code = 403, message = "Доступ запрещен"),
+      @ApiResponse(code = 404, message = "Пользователь не найден")
+  })
   @DeleteMapping
   @PreAuthorize("hasAuthority('USER') && #id == authentication.principal.id")
-  public ResponseEntity<?> deleteUser(@RequestParam Long id) throws NotFoundException {
+  public ResponseEntity<?> deleteUser(@ApiParam("Идентификатор пользователя") @RequestParam Long id)
+      throws NotFoundException {
     return ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(id));
   }
 }

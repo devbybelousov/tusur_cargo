@@ -51,7 +51,7 @@ public class OrderServiceImpl implements OrderService {
         orderRequest.getPrice(),
         orderRequest.getDepartDate(),
         orderRequest.getArrivalDate(),
-        sizeRepository.save(orderRequest.getSize()),
+        sizeRepository.save(orderRequest.getOrderSize()),
         orderRequest.getImagesId().stream()
             .map(photoRepository::findByPhotoId)
             .collect(Collectors.toList()));
@@ -141,7 +141,7 @@ public class OrderServiceImpl implements OrderService {
     oldOrder.setPrice(orderRequest.getPrice());
     oldOrder.setDepartDate(orderRequest.getDepartDate());
     oldOrder.setArrivalDate(orderRequest.getArrivalDate());
-    oldOrder.setSize(orderRequest.getSize());
+    oldOrder.setOrderSize(orderRequest.getOrderSize());
     oldOrder.setPhotos(orderRequest.getImagesId().stream()
         .map(photoRepository::findByPhotoId)
         .collect(Collectors.toList()));
